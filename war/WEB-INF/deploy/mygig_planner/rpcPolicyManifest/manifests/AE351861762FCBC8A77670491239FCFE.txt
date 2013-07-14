@@ -1,0 +1,2 @@
+serviceClass: com.dynamic_confusion.mygig_planner.client.users.UserService
+path: 556B899A1542B53B46E746137FB28500.gwt.rpc
