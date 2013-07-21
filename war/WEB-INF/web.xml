@@ -16,7 +16,7 @@
     <url-pattern>/mygig_planner/users</url-pattern>
   </servlet-mapping>
 
-  <!-- Servlets -->
+  <!-- Servlets suck -->
   <servlet>
     <servlet-name>gigServlet</servlet-name>
     <servlet-class>com.dynamic_confusion.mygig_planner.server.gigs.GigTransactionServiceImpl</servlet-class>
