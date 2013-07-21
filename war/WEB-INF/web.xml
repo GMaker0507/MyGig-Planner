@@ -15,6 +15,17 @@
     <servlet-name>userServlet</servlet-name>
     <url-pattern>/mygig_planner/users</url-pattern>
   </servlet-mapping>
+  
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>registrationServlet</servlet-name>
+    <servlet-class>com.dynamic_confusion.mygig_planner.server.users.RegistrationServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>registrationServlet</servlet-name>
+    <url-pattern>/mygig_planner/registration</url-pattern>
+  </servlet-mapping>
 
   <!-- Servlets Suck -->
   <servlet>
