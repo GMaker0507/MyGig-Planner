@@ -56,6 +56,16 @@ public class UserServiceClientImpl implements UserServiceClientInt{
 		attemptLogout(new DefaultCallback());
 	}
 	
+	public void getUsers(AsyncCallback callback){
+		
+		this.service.getUsers(callback);
+	}
+	
+	public void getUsers(){
+		
+		getUsers(new DefaultCallback());
+	}
+	
 	private class DefaultCallback implements AsyncCallback{
 		
 		@Override

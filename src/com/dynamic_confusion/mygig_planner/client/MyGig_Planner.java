@@ -2,6 +2,10 @@ package com.dynamic_confusion.mygig_planner.client;
 
 import java.util.HashMap;
 
+
+
+
+import com.dynamic_confusion.mygig_planner.client.gigs.GigTransactionServiceClientImpl;
 import com.dynamic_confusion.mygig_planner.client.users.UserServiceClientImpl;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -12,10 +16,12 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -27,6 +33,7 @@ import com.google.gwt.user.client.ui.TextBox;
  */
 public class MyGig_Planner implements EntryPoint {
 	
+	public static String error = "No Error";
 
 	/**
 	 * This is the entry point method.
@@ -127,7 +134,10 @@ public class MyGig_Planner implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				UserServiceClientImpl registerServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"UserService");
+				registerButton.setText("Proccessing...");
+				registerButton.setEnabled(false);
+				
+				UserServiceClientImpl registerServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");
 				
 				HashMap<String,Object> userInfo = new HashMap<String,Object>();
 				
@@ -142,6 +152,9 @@ public class MyGig_Planner implements EntryPoint {
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
 						super.onFailure(caught);
+						
+						registerButton.setText("Register");
+						registerButton.setEnabled(true);
 					
 						// Show the message
 						RootPanel.get().add(new HTML(caught.toString()));
@@ -155,7 +168,14 @@ public class MyGig_Planner implements EntryPoint {
 						if((Boolean)result==true){
 						
 							RootPanel.get().add(new HTML("Registration Successful!"));
+							
+							registerButton.setText("Success");
+							//registerButton.setEnabled(true);
 						}else{
+							
+							registerButton.setText("Register");
+							registerButton.setEnabled(true);
+							
 							RootPanel.get().add(new HTML("That username and/or email is already in use."));
 						}
 					}
@@ -173,7 +193,7 @@ public class MyGig_Planner implements EntryPoint {
 				loginButton.setText("Processing...");
 				loginButton.setEnabled(false);
 				
-				UserServiceClientImpl loginServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"UserService");				
+				UserServiceClientImpl loginServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");				
 				
 				// Attempt to login
 				loginServ.attemptLogin(tbLoginUsername.getText(), tbLoginPassword.getText(), new CustomCallback(){
@@ -228,16 +248,164 @@ public class MyGig_Planner implements EntryPoint {
 		
 		loginPanel.add(loginButton);
 		
-		home.add(new Label("Username:"));		
-		home.add(tbUsername);
+
 		
-		home.add(new Label("Password:"));
-		home.add(tbPassword);
+		// If we have an active user
+		if(Cookies.getCookie("activeUser")!=null){
+			
+			UserServiceClientImpl getUsers = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");
+
+			
+			getUsers.getUsers(new AsyncCallback(){
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+					RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
+				}
+				
+				public void onSuccess(Object result) {
+					
+					final String[] users = (String[])result;
+					
+
+					
+					home.add(new HTML("<h3>Users</h3>"));
+					
+					for(int i=0;i<users.length;i++){
+						
+						final String currentUserGridUser = users[i];
+						
+						Anchor sendOfferLink = new Anchor(currentUserGridUser +" - Send an Offer");
+						
+						home.add(sendOfferLink);
+						
+						sendOfferLink.addClickHandler(new ClickHandler(){
+							
+							@Override
+							public void onClick(ClickEvent event) {
+								// TODO Auto-generated method stub
+								GigTransaction newGig = new GigTransaction();
+								
+								newGig.setSendUser( Cookies.getCookie("activeUser"));
+								newGig.setRecipientUser(currentUserGridUser);
+								
+								GigTransactionServiceClientImpl sendOffer = new GigTransactionServiceClientImpl(GWT.getModuleBaseURL()+"gigs");
+								
+								sendOffer.sendOffer(newGig, new AsyncCallback(){
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										// TODO Auto-generated method stub
+
+										RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
+									}
+									
+									@Override
+									public void onSuccess(Object result) {
+										// TODO Auto-generated method stub
+
+										if(((String)result).trim().equals("success"))RootPanel.get().add(new HTML("<p>Gig offer sent!</p>"));
+										else RootPanel.get().add(new HTML("<p>Gig offer failed to send!</p><p>"+(String)result+"</p>"));
+									}
+									
+								});
+								
+								
+							}
+						});
+						
+						//<a href=\""+GWT.getModuleBaseURL()+"sendOffer\">Send an Offer</a>");
+						
+					}
+				};
+			});
+			
+			final GigTransactionServiceClientImpl getOffers = new GigTransactionServiceClientImpl(GWT.getModuleBaseURL()+"gigs");
+			
+			getOffers.getOffers(new AsyncCallback(){
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+
+					RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
+				}
+				
+				@Override
+				public void onSuccess(Object result) {
+					
+					if(result == null){
+						
+						getOffers.getErrorMessage(new AsyncCallback(){
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+								home.add(new HTML("<p>Error getting gig offers!</p><br><p>"+caught.getMessage()+"</p>"));
+								
+							}
+							
+							@Override
+							public void onSuccess(Object result) {
+								// TODO Auto-generated method stub
+								home.add(new HTML("<p>Error getting gig offers!</p><br><p>"+result+"</p>"));
+							}
+						});
+						
+						
+					}else{
+					
+						// TODO Auto-generated method stub
+						GigTransaction[] gigs = (GigTransaction[])result;
+						
+						Grid gigGrid = new Grid(gigs.length,1);
+						
+						for(int i=0;i<gigs.length;i++){
+							
+							
+							if(gigs[i].getStatus()==0&&
+							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
+								home.add(new HTML("<p>Offer by "+gigs[i].getSendUser()+"</p>"));
+								
+								
+							}else if(gigs[i].getStatus()==-1&&
+							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
+								home.add(new HTML("<p>You rejected "+gigs[i].getSendUser()+"'s Offer</p>"));
+							}else if(gigs[i].getStatus()==1&&
+							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
+								home.add(new HTML("<p>You accepted "+gigs[i].getSendUser()+"'s Offer</p>"));
+							}else if(gigs[i].getStatus()==-1&&
+							   gigs[i].getSendUser().equals(Cookies.getCookie("activeUser"))){
+								home.add(new HTML("<p>"+gigs[i].getRecipientUser()+"rejected your offer</p>"));
+							}else if(gigs[i].getStatus()==1&&
+							   gigs[i].getSendUser().equals(Cookies.getCookie("activeUser"))){
+								home.add(new HTML("<p>"+gigs[i].getRecipientUser()+" accepted your offer</p>"));
+							}
+						}
+						
+						
+	
+						home.add(new HTML("<h3>Gig Offers</h3>"));
+						home.add(gigGrid);
+					}
+				}
+				
+			});
+			
+		}else{
 		
-		home.add(new Label("Type:"));
-		home.add(lbType);
-		
-		home.add(registerButton);
+			home.add(new Label("Username:"));		
+			home.add(tbUsername);
+			
+			home.add(new Label("Password:"));
+			home.add(tbPassword);
+			
+			home.add(new Label("Type:"));
+			home.add(lbType);
+			
+			home.add(registerButton);
+		}
 		
 		RootPanel.get().add(tp);
 		DOM.setElementAttribute(tp.getElement(), "id","mainTabPanel");

@@ -104,4 +104,33 @@ public class UserServiceImpl extends RemoteServiceServlet implements UserService
 		
 		return valid;
 	}
+	
+	@Override
+	public String[] getUsers() {
+		
+		String[] users = null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Two queries on the datastorie
+		Query allUsers = new Query("User");
+
+		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
+
+		// Get all user entitiesin a list
+		List<Entity> userEntities = pqAllUsers.asList(FetchOptions.Builder.withDefaults());
+		
+		// Reformat the rray
+		users = new String[userEntities.size()];
+		
+		// For each user entity
+		for(int i=0;i<users.length;i++){
+			
+			// ADd the username ot the list
+			users[i] = (String) userEntities.get(i).getProperty("username");
+		}
+		
+		// TODO Auto-generated method stub
+		return users;
+	}
 }

@@ -12,4 +12,5 @@ public interface UserServiceClientInt {
 	void attemptRegister(HashMap<String,Object> newUser);
 	void attemptRegister(HashMap<String,Object> newUser, AsyncCallback callback);
 	
+	void getUsers(AsyncCallback callback);
 }

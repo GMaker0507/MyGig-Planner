@@ -12,4 +12,6 @@ public interface UserService extends RemoteService {
 	boolean attemptLogout();
 	
 	boolean attemptRegister(HashMap<String,Object> newUser);
+	
+	String[] getUsers();
 }
