@@ -1,2 +1,0 @@
-# Module mygig_planner
-# RPC service class, partial path of RPC policy file
