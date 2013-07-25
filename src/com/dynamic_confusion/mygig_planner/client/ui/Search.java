@@ -3,6 +3,7 @@ package com.dynamic_confusion.mygig_planner.client.ui;
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
 import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,6 +25,7 @@ public class Search extends Composite {
 	public Search(ServerSideServiceClientImpl ssService) {
 		
 		this.ssService = ssService;
+		searchTable = new FlexTable();
 		
 		VerticalPanel form = new VerticalPanel();
 		initWidget(form);
