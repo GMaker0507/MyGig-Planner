@@ -17,8 +17,16 @@ import com.google.gwt.user.client.ui.CheckBox;
 
 public class Browse extends Composite {
 	private ScrollPanel scrollPanel;
-	FlexTable browseTable;
+	private FlexTable browseTable;
 	private ServerSideServiceClientImpl ssService;
+	
+	int minCapacity;
+	int minPay;
+	Boolean requiresPA;
+	Boolean requiresHospPack;
+	Boolean original;
+	Boolean needsSoundPerson;
+	Boolean availableOnly = false;
 	
 	public Browse(ServerSideServiceClientImpl service) {
 		
@@ -34,6 +42,7 @@ public class Browse extends Composite {
 		form.setWidget(0, 0, browseTable);
 		browseTable.setSize("120px", "490px");
 		
+		// Browse Label
 		Label browseLabel = new Label("Browse");
 		browseLabel.setStyleName("mgp-Label");
 		browseTable.setWidget(0, 0, browseLabel);
@@ -55,33 +64,66 @@ public class Browse extends Composite {
 		browseButton.setStyleName("mgp-Button");
 		absolutePanel.add(browseButton, 10, 403);
 		
+		// Radiio buttons for Availability
 		{
-			// Check boxes for Availability
-			RadioButton radioBtnAll = new RadioButton("All Bands");
+			Label lblAvailable = new Label("Available");
+			absolutePanel.add(lblAvailable, 0, 3);
+			
+			RadioButton radioBtnAll = new RadioButton("all_bands");
+			radioBtnAll.addClickHandler(new ClickHandler(){
+				public void onClick(ClickEvent event) {
+					availableOnly = false;
+				}
+			});
+			
 			radioBtnAll.setText("All Bands");
 			absolutePanel.add(radioBtnAll, 10, 25);
 			radioBtnAll.setSize("110px", "20px");
 			
-			Label lblAvailable = new Label("Available");
-			absolutePanel.add(lblAvailable, 0, 3);
-			
 			RadioButton radioBtnAvail = new RadioButton("available");
+			radioBtnAll.addClickHandler(new ClickHandler(){
+				public void onClick(ClickEvent event) {
+					availableOnly = true;
+				}
+			});
 			radioBtnAvail.setText("Available Only");
 			absolutePanel.add(radioBtnAvail, 10, 51);
 			radioBtnAvail.setSize("110px", "20px");
 		}
 		
-		Label lblGenre = new Label("Genre");
-		absolutePanel.add(lblGenre, 0, 86);
+		// Check boxes for Genre
+		{
+			Label lblGenre = new Label("Genre");
+			absolutePanel.add(lblGenre, 0, 86);
+			
+			CheckBox chckbxRock = new CheckBox("Rock");
+			absolutePanel.add(chckbxRock, 10, 110);
+			
+			CheckBox chckbxPop = new CheckBox("Pop");
+			absolutePanel.add(chckbxPop, 10, 130);
+			
+			CheckBox chckbxCountry = new CheckBox("Country");
+			absolutePanel.add(chckbxCountry, 10, 156);
+
+			CheckBox chckbxSka = new CheckBox("Ska");
+			absolutePanel.add(chckbxCountry, 10, 156);
+			
+			CheckBox chckbxReggae = new CheckBox("Reggae");
+			absolutePanel.add(chckbxCountry, 10, 156);
+
+			CheckBox chckbxBluegrass = new CheckBox("Bluegrass");
+			absolutePanel.add(chckbxCountry, 10, 156);
+
+			CheckBox chckbxHiphop = new CheckBox("Hiphop");
+			absolutePanel.add(chckbxCountry, 10, 156);
+
+			CheckBox chckbxIndustrial = new CheckBox("Industrial");
+			absolutePanel.add(chckbxCountry, 10, 156);
+
+			CheckBox chckbxRockabilly = new CheckBox("Rockabilly");
+			absolutePanel.add(chckbxCountry, 10, 156);
+		}
 		
-		CheckBox chckbxRock = new CheckBox("Rock");
-		absolutePanel.add(chckbxRock, 10, 110);
-		
-		CheckBox chckbxPop = new CheckBox("Pop");
-		absolutePanel.add(chckbxPop, 10, 130);
-		
-		CheckBox chckbxCountry = new CheckBox("Country");
-		absolutePanel.add(chckbxCountry, 10, 156);
 		
 		// Scroll panel displaying browse results
 		scrollPanel = new ScrollPanel();
@@ -91,12 +133,10 @@ public class Browse extends Composite {
 	}
 	
 	private void getResults() {
-		BandDatabase database = new BandDatabase();
-		Band[] bands = database.getBands();
-		final UserInfo userInfo;
+		// BandDatabase database = new BandDatabase();
+		// Band[] bands = database.getBands();
 		
 		SearchInfo searchInfo = new SearchInfo();
-		// TODO populate field
 
 		ssService.search(searchInfo, new AsyncCallback() {
 
@@ -107,9 +147,11 @@ public class Browse extends Composite {
 
 			public void onSuccess(Object result) {
 				UserInfo[] userInfo = (UserInfo[]) result;
-				
-				for(UserInfo user : userInfo) {
-					//browseTable.add();
+
+				// Sets result of browse to tables
+				for(int i = 0 ; i < userInfo.length ; i++) {
+					browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
+					browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
 					
 				}
 			}

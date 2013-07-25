@@ -1,8 +1,9 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
-import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideService;
+import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -17,15 +18,19 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 
 public class Search extends Composite {
 	private TextBox searchTextBox;
-	private FlexTable resultsPanel;
+	private FlexTable searchTable;
+	private ServerSideServiceClientImpl ssService;
 	
 	public Search(ServerSideServiceClientImpl ssService) {
+		
+		this.ssService = ssService;
+		
 		VerticalPanel form = new VerticalPanel();
 		initWidget(form);
 		form.setSize("870px", "490px");
 		
-		form.add(resultsPanel);
-		resultsPanel.setSize("700px", "700px");
+		form.add(searchTable);
+		searchTable.setSize("700px", "700px");
 		
 		// Search Title label
 		Label searchLabel = new Label("Search");
@@ -74,27 +79,36 @@ public class Search extends Composite {
 	}
 	
 	private void getResults() {
-		//final String[] searchWords = searchTextBox.getText().split(" ");
+		final String[] searchWords = searchTextBox.getText().split(" ");
 
-		
-		//TODO Write search algorithm
-		
-		
+		SearchInfo searchInfo = new SearchInfo();
+		// TODO populate field
 
-			Image userImage = new Image();
-			userImage.setUrl("http://www.google.com/images/srpr/logo4w.png");
-			
-			Label username = new Label("Bill");
-			
-			username.setStyleName("mgp-Label");
-			username.setSize("57px", "19px");
-			
-			Image sendGigImage = new Image();
-			sendGigImage.setUrl("http://s.ytimg.com/yts/img/pixel-vfl3z5WfW.gif");
-			
-			resultsPanel.setWidget(0,0,userImage);
-			resultsPanel.setWidget(0,1,username);
-			resultsPanel.setWidget(1,1,sendGigImage);
+		ssService.search(searchInfo, new AsyncCallback() {
+
+			public void onFailure(Throwable caught) {
+				String errMsg ="<p>" + caught.getMessage() + "</p>";
+				searchTable.clear();
+				searchTable.add(new Label(errMsg));
+			}
+
+			public void onSuccess(Object result) {
+				UserInfo[] userInfo = (UserInfo[]) result;
+
+				// Sets result of search to tables
+				int numRow = 0;
+				for(int i = 0 ; i < userInfo.length ; i++) {
+					for(String word : searchWords) {
+						// Displays result if username contains searched word
+						if(userInfo[i].username.contains(word)) {
+							searchTable.setWidget(2*numRow, 0, new Label(userInfo[i].username));
+							searchTable.setWidget(2*numRow+1, 0, new Label(userInfo[i].email));
+							numRow++;
+							break;
+						}
+					}
+				}
+			}
+		});
 	}
-
 }
