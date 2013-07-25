@@ -1,16 +1,18 @@
 package com.dynamic_confusion.mygig_planner.client;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-
-
-
-import com.dynamic_confusion.mygig_planner.client.gigs.GigTransactionServiceClientImpl;
-import com.dynamic_confusion.mygig_planner.client.users.UserServiceClientImpl;
+import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
@@ -19,19 +21,27 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DatePicker;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class MyGig_Planner implements EntryPoint {
+
+
+	final ServerSideServiceClientImpl ssService = new ServerSideServiceClientImpl();
 	
 	public static String error = "No Error";
 
@@ -56,23 +66,33 @@ public class MyGig_Planner implements EntryPoint {
 		filesGrid.setHTML(3, 0, "Low Level Design");
 		
 		final AbsolutePanel home = new AbsolutePanel();
+		final AbsolutePanel profilePanel = new AbsolutePanel();
+		final AbsolutePanel search = new AbsolutePanel();
 		final AbsolutePanel loginPanel = new AbsolutePanel();
+		final AbsolutePanel logbook = new AbsolutePanel();
+		
 		
 		final FormPanel form = new FormPanel();
+		final FormPanel profileForm = new FormPanel();
 		final FormPanel loginForm = new FormPanel();
+		
+		profileForm.setWidget(profilePanel);
+		profileForm.setEncoding(FormPanel.ENCODING_URLENCODED);
+		profileForm.setMethod(FormPanel.METHOD_POST);
+		profileForm.setAction("/server-side/profile");
 		
 		loginForm.setWidget(loginPanel);
 		loginForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		loginForm.setMethod(FormPanel.METHOD_GET);
-		loginForm.setAction("LoginServlet");
+		loginForm.setAction("/server-side/login");
 		
 		form.setWidget(home);
 		form.setEncoding(FormPanel.ENCODING_URLENCODED);
-		form.setMethod(FormPanel.METHOD_GET);
-		form.setAction("RegisterServlet");
+		form.setMethod(FormPanel.METHOD_POST);
+		form.setAction("/server-side/registration");
 		
 		// Add some default panels
-		tp.add(home,"Home");
+		tp.add(form,"Home");
 		
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
@@ -95,17 +115,19 @@ public class MyGig_Planner implements EntryPoint {
 				}
 			});
 		
-			tp.add(new HTML("tab 1"),"Logbook");
+			tp.add(logbook,"Logbook");
 			tp.add(new HTML("tab 1"),"Calender");
-			tp.add(new HTML("tab 1"),"Search/Browse");
+			tp.add(profileForm,"View/Edit Profile");
+			tp.add(search,"Search/Browse");
 		
-		}else tp.add(loginPanel,"Login");
+		}else tp.add(loginForm,"Login");
 		
 		tp.add(new HTML("tab 3"),"Help");
 		tp.add(filesGrid,"Project Files & Information");
 		
 		final TextBox tbUsername = new TextBox();
 		final TextBox tbPassword = new TextBox();
+		final TextBox tbEmail = new TextBox();
 		final ListBox lbType = new ListBox();
 		
 		// Add the two possible types
@@ -114,8 +136,9 @@ public class MyGig_Planner implements EntryPoint {
 		
 		// Set the name for the form		
 		lbType.setName("type");
-		tbPassword.setName("username");
-		tbUsername.setName("password");
+		tbEmail.setName("email");
+		tbPassword.setName("password");
+		tbUsername.setName("username");
 		
 		// A button for registering
 		final Button registerButton = new Button("Register");
@@ -134,129 +157,139 @@ public class MyGig_Planner implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				registerButton.setText("Proccessing...");
-				registerButton.setEnabled(false);
+				// Submit the form
+				form.submit();
 				
-				UserServiceClientImpl registerServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");
-				
-				HashMap<String,Object> userInfo = new HashMap<String,Object>();
-				
-				userInfo.put("username", tbUsername.getText());
-				userInfo.put("password", tbPassword.getText());
-				userInfo.put("type", lbType.getItemText(lbType.getSelectedIndex()));
-				
-				// Attempt to login
-				registerServ.attemptRegister(userInfo, new CustomCallback(){
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						super.onFailure(caught);
-						
-						registerButton.setText("Register");
-						registerButton.setEnabled(true);
-					
-						// Show the message
-						RootPanel.get().add(new HTML(caught.toString()));
-					}
-					
-					@Override
-					public void onSuccess(Object result) {
-						// TODO Auto-generated method stub
-						super.onSuccess(result);
-						
-						if((Boolean)result==true){
-						
-							RootPanel.get().add(new HTML("Registration Successful!"));
-							
-							registerButton.setText("Success");
-							//registerButton.setEnabled(true);
-						}else{
-							
-							registerButton.setText("Register");
-							registerButton.setEnabled(true);
-							
-							RootPanel.get().add(new HTML("That username and/or email is already in use."));
-						}
-					}
-				});
 				
 			}
 		});
 		
+		form.addSubmitCompleteHandler(new SubmitCompleteHandler(){
 			
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				// TODO Auto-generated method stub
+				
+				String registerResults = event.getResults().trim();
+				
+				// If it says success
+				if(registerResults.equals("success")){
+					
+					// Setthe cookie
+					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
+					
+					// Reload
+					Window.Location.reload();
+
+				}else{
+
+
+					String errorMessage = registerResults;
+					
+					// TODO handle output of error message
+					
+					home.add(new HTML(errorMessage));
+				}
+			}
+		});
+					
 		loginButton.addClickHandler(new ClickHandler(){
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				
-				loginButton.setText("Processing...");
-				loginButton.setEnabled(false);
-				
-				UserServiceClientImpl loginServ = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");				
-				
-				// Attempt to login
-				loginServ.attemptLogin(tbLoginUsername.getText(), tbLoginPassword.getText(), new CustomCallback(){
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						
-						// TODO Auto-generated method stub
-						super.onFailure(caught);						
 
-						// Show the message
-						RootPanel.get().add(new HTML(caught.toString()));
-						
-						loginButton.setText("Login");
-						loginButton.setEnabled(true);
-					
-					}
-					
-					@Override
-					public void onSuccess(Object result) {
-						
-						// TODO Auto-generated method stub
-						super.onSuccess(result);						
-
-						if((Boolean)result==true){
-							
-							// Set the active user cookie
-							Cookies.setCookie("activeUser", tbLoginUsername.getText());
-
-							// Reload the page
-							Window.Location.reload();
-						}else{
-							
-							loginButton.setText("Login");
-							loginButton.setEnabled(true);
-							
-							RootPanel.get().add(new HTML("[ "+result+" ] That username/password combination is invalid."));
-						}
-					
-					}
-				});
+				// Submit the form
+				loginForm.submit();
 			}
 		});
 		
+		loginForm.addSubmitCompleteHandler(new SubmitCompleteHandler(){
+			
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				// TODO Auto-generated method stub
+				
+				String loginResults = event.getResults().trim();
+				
+				// If it says success
+				if(loginResults.equalsIgnoreCase("success")){
+					
+					// Setthe cookie
+					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
+					
+					// Reload
+					Window.Location.reload();
+					
+				}else{
 
+					String errorMessage = loginResults;
+					
+					// TODO handle output of error message
+					loginPanel.add(new HTML(errorMessage));
+				}
+				
+			}
+		});
+		
 		loginPanel.add(new Label("Username:"));		
 		loginPanel.add(tbLoginUsername);
 		
 		loginPanel.add(new Label("Password:"));
 		loginPanel.add(tbLoginPassword);
-
 		
 		loginPanel.add(loginButton);
 		
+		Button searchButton = new Button("Search!");
+		Button addDateButton = new Button("Add Date");
+		
+		final TextBox searchBox = new TextBox();
+		final DatePicker datePicker = new DatePicker();		
+		final List<Date> availableDates = new ArrayList<Date>();
+		
+		searchButton.addClickHandler(new ClickHandler(){
+			
+			@Override
+			public void onClick(ClickEvent event) {
 
+				
+				SearchInfo info = new SearchInfo(searchBox.getText());
+				
+				// TODO populate other fields of the search info 
+				
+				
+				// Call the search function
+				ssService.search(info, new CustomCallback(){
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						
+						
+					}
+					
+					@Override
+					public void onSuccess(Object result) {
+
+						UserInfo[] users = (UserInfo[])result;
+						
+						// TODO handle search results
+						
+						
+					}
+					
+				});
+			}
+		});
+		
+		search.add(datePicker);
+		search.add(addDateButton);
+		search.add(searchBox);
+		search.add(searchButton);
+				
 		
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
 			
-			UserServiceClientImpl getUsers = new UserServiceClientImpl(GWT.getModuleBaseURL()+"users");
-
-			
-			getUsers.getUsers(new AsyncCallback(){
+			ssService.getUsers(new AsyncCallback(){
 				
 				@Override
 				public void onFailure(Throwable caught) {
@@ -267,7 +300,7 @@ public class MyGig_Planner implements EntryPoint {
 				
 				public void onSuccess(Object result) {
 					
-					final String[] users = (String[])result;
+					final UserInfo[] users = (UserInfo[])result;
 					
 
 					
@@ -275,7 +308,7 @@ public class MyGig_Planner implements EntryPoint {
 					
 					for(int i=0;i<users.length;i++){
 						
-						final String currentUserGridUser = users[i];
+						final String currentUserGridUser = users[i].username;
 						
 						Anchor sendOfferLink = new Anchor(currentUserGridUser +" - Send an Offer");
 						
@@ -286,14 +319,14 @@ public class MyGig_Planner implements EntryPoint {
 							@Override
 							public void onClick(ClickEvent event) {
 								// TODO Auto-generated method stub
-								GigTransaction newGig = new GigTransaction();
+								GigInfo newGig = new GigInfo();
 								
-								newGig.setSendUser( Cookies.getCookie("activeUser"));
-								newGig.setRecipientUser(currentUserGridUser);
+								newGig.sendUser=( Cookies.getCookie("activeUser"));
+								newGig.recipientUser = (currentUserGridUser);
+								newGig.dateSent = new Date();
+								newGig.name="gig";								
 								
-								GigTransactionServiceClientImpl sendOffer = new GigTransactionServiceClientImpl(GWT.getModuleBaseURL()+"gigs");
-								
-								sendOffer.sendOffer(newGig, new AsyncCallback(){
+								ssService.sendOffer(newGig, new AsyncCallback(){
 									
 									@Override
 									public void onFailure(Throwable caught) {
@@ -322,14 +355,12 @@ public class MyGig_Planner implements EntryPoint {
 				};
 			});
 			
-			final GigTransactionServiceClientImpl getOffers = new GigTransactionServiceClientImpl(GWT.getModuleBaseURL()+"gigs");
-			
-			getOffers.getOffers(new AsyncCallback(){
+			ssService.getOffers(new AsyncCallback(){
 				@Override
 				public void onFailure(Throwable caught) {
 					// TODO Auto-generated method stub
 
-					RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
+					logbook.add(new HTML("<p>"+caught.getMessage()+"</p>"));
 				}
 				
 				@Override
@@ -337,19 +368,19 @@ public class MyGig_Planner implements EntryPoint {
 					
 					if(result == null){
 						
-						getOffers.getErrorMessage(new AsyncCallback(){
+						ssService.getErrorMessage(new AsyncCallback(){
 							
 							@Override
 							public void onFailure(Throwable caught) {
 								// TODO Auto-generated method stub
-								home.add(new HTML("<p>Error getting gig offers!</p><br><p>"+caught.getMessage()+"</p>"));
+								logbook.add(new HTML("<p>Error getting gig offers!</p><br><p>"+caught.getMessage()+"</p>"));
 								
 							}
 							
 							@Override
 							public void onSuccess(Object result) {
 								// TODO Auto-generated method stub
-								home.add(new HTML("<p>Error getting gig offers!</p><br><p>"+result+"</p>"));
+								logbook.add(new HTML("<p>Error getting gig offers!</p><br><p>"+result+"</p>"));
 							}
 						});
 						
@@ -357,41 +388,301 @@ public class MyGig_Planner implements EntryPoint {
 					}else{
 					
 						// TODO Auto-generated method stub
-						GigTransaction[] gigs = (GigTransaction[])result;
+						GigInfo[] gigs = (GigInfo[])result;
 						
 						Grid gigGrid = new Grid(gigs.length,1);
+
+						// Add the header
+						logbook.add(new HTML("<h3>Gig Offers</h3>"));
 						
 						for(int i=0;i<gigs.length;i++){
 							
 							
-							if(gigs[i].getStatus()==0&&
-							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
-								home.add(new HTML("<p>Offer by "+gigs[i].getSendUser()+"</p>"));
+							if(gigs[i].status==0&&
+							    gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))){
+								
+								// Add a paragraph
+								logbook.add(new HTML("<p>Offer by "+gigs[i].sendUser+"</p><br/>"+
+										"<form action=\"/gig/accept\" method=\"post\">"
+											+ "<input type=\"hidden\" name=\"action\" value=\"accept\">"
+											+ "<input type=\"hidden\" name=\"recipientUser\" value=\""+Cookies.getCookie("activeUser")+"\">"
+											+ "<input type=\"hidden\" name=\"key\" value=\""+gigs[i].key+"\">"
+											+ "<input type=\"submit\" value=\"accept\">"
+										+ "</form>"+
+										"<form action=\"/gig/reject\" method=\"post\">"
+											+ "<input type=\"hidden\" name=\"action\" value=\"reject\">"
+											+ "<input type=\"hidden\" name=\"recipientUser\" value=\""+Cookies.getCookie("activeUser")+"\">"
+											+ "<input type=\"hidden\" name=\"key\" value=\""+gigs[i].key+"\">"
+											+ "<input type=\"submit\" value=\"reject\">"
+										+ "</form>"));
 								
 								
-							}else if(gigs[i].getStatus()==-1&&
-							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
-								home.add(new HTML("<p>You rejected "+gigs[i].getSendUser()+"'s Offer</p>"));
-							}else if(gigs[i].getStatus()==1&&
-							   gigs[i].getRecipientUser().equals(Cookies.getCookie("activeUser"))){
-								home.add(new HTML("<p>You accepted "+gigs[i].getSendUser()+"'s Offer</p>"));
-							}else if(gigs[i].getStatus()==-1&&
-							   gigs[i].getSendUser().equals(Cookies.getCookie("activeUser"))){
-								home.add(new HTML("<p>"+gigs[i].getRecipientUser()+"rejected your offer</p>"));
-							}else if(gigs[i].getStatus()==1&&
-							   gigs[i].getSendUser().equals(Cookies.getCookie("activeUser"))){
-								home.add(new HTML("<p>"+gigs[i].getRecipientUser()+" accepted your offer</p>"));
+							}else if(gigs[i].status==-1&&
+							    gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))){
+								
+								// Alert the user what happend
+								logbook.add(new HTML("<p>You rejected "+gigs[i].sendUser+"'s Offer on "+gigs[i].dateReplied+"</p>"));
+							}else if(gigs[i].status==1&&
+							    gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))){
+								
+								// Alert the user what happend
+								logbook.add(new HTML("<p>You accepted "+gigs[i].sendUser+"'s Offer on "+gigs[i].dateReplied+"</p>"));
+							}else if(gigs[i].status==-1&&
+							    gigs[i].sendUser.equals(Cookies.getCookie("activeUser"))){
+								
+								// Alert the user what happend
+								logbook.add(new HTML("<p>"+gigs[i].recipientUser+"rejected your offer on "+gigs[i].dateReplied+"</p>"));
+							}else if(gigs[i].status==1&&
+							    gigs[i].sendUser.equals(Cookies.getCookie("activeUser"))){
+								
+								// Alert the user what happend
+								logbook.add(new HTML("<p>"+gigs[i].recipientUser+" accepted your offer on "+gigs[i].dateReplied+"</p>"));
 							}
 						}
-						
-						
-	
-						home.add(new HTML("<h3>Gig Offers</h3>"));
-						home.add(gigGrid);
 					}
 				}
 				
 			});
+			
+			Date monthStart, monthEnd;
+			Date today = new Date();
+			
+			final int month = today.getMonth();
+			final int year = today.getYear();
+			
+			monthStart = new Date(year,month,1);
+			monthEnd = new Date(year, month, 31);
+			
+			this.ssService.getDatesAvailable(Cookies.getCookie("activeUser"),monthStart,monthEnd,new AsyncCallback(){
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					home.add(new HTML("Error trying to get availability."));
+				}
+
+				@Override
+				public void onSuccess(Object result) {
+					// TODO Auto-generated method stub
+					
+					Date[] dates = (Date[])result;
+					
+					Grid calender = new Grid(5,7);
+					
+					int ci = 0;
+					int ri = 0;
+
+					for(int i=0;i<31;i++){
+						
+						final int date = i+1;
+						Date di = new Date(year,month,date);
+						
+						boolean isAvailable = false;
+						
+						for(int j=0;j<dates.length;j++){
+							
+							if(di.equals(dates[j])==false)continue;
+							
+							isAvailable = true;
+							break;
+						}
+
+						Anchor caAnchor = null;
+						
+						if(isAvailable)caAnchor = new Anchor("[Available] - "+di.toString());				
+						else caAnchor = new Anchor("[Not Available] - "+di.toString());
+						
+						caAnchor.addClickHandler(new ClickHandler(){
+							
+							public void onClick(ClickEvent event) {
+								
+								RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,"/changeAvailability?"
+										+ "user="+Cookies.getCookie("activeUser")+"&"
+										+ "year="+year+"&"
+										+ "month="+month+"&"
+										+ "date="+date);
+								
+								try {
+									rb.sendRequest(null,new RequestCallback(){
+										
+										@Override
+										public void onError(Request request,
+												Throwable exception) {
+											// TODO Auto-generated method stub
+											home.add(new HTML(exception.getMessage()));
+											
+										}
+										
+										@Override
+										public void onResponseReceived(
+												Request request, Response response) {
+											// TODO Auto-generated method stub
+											
+											String rText = response.getText();
+											
+											if(rText.equals("success")){
+												
+												Window.Location.reload();
+											}else{
+												
+												home.add(new HTML(rText));
+											}
+										}
+									});
+								} catch (RequestException e) {
+									// TODO Auto-generated method stub
+									home.add(new HTML(e.getMessage()));
+								}
+								
+							};
+						});
+						
+						calender.setWidget(ri,ci, caAnchor);
+							
+						ci = ci+1;
+						if(ci==7)ri++;
+						ci = ci % 7;
+						
+					}
+					
+					home.add(calender);
+				}
+				
+			});
+			
+			String profileUser = Window.Location.getParameter("user") ==null ? Cookies.getCookie("activeUser") : Window.Location.getParameter("user");
+			
+			// If we have a bad profile user
+			if(profileUser==null){
+				
+				// Show we have nothing good
+				profilePanel.add(new HTML("No valid user given to show!"));
+			}else{
+				
+				// ARe we editing
+				final boolean editing = (Window.Location.getParameter("user")==null||
+										(Window.Location.getParameter("user")==Cookies.getCookie("activeUser")&&Cookies.getCookie("activeUser")!=null))
+										&&Window.Location.getParameter("edit")!=null;
+				Button profileButton = null;
+				
+				// If we dont have a user
+				if(Window.Location.getParameter("user")==null){
+					
+					// If the edit parameter is set
+					if(Window.Location.getParameter("edit")!=null){
+						
+						// Add the done editing parameter
+						profilePanel.add(profileButton = new Button("Done Editing!"));
+						
+						// Lisen for when it is clicked
+						profileButton.addClickHandler(new ClickHandler(){
+							
+							@Override
+							public void onClick(ClickEvent event) {
+
+								profileForm.addSubmitHandler(new SubmitHandler(){
+
+									@Override
+									public void onSubmit(
+											SubmitEvent event) {
+										// TODO Auto-generated method stub
+										
+										String wlNoParameters = Window.Location.getHref();
+										int noParamIndex =wlNoParameters.indexOf("?");
+										if(noParamIndex>=0)wlNoParameters = wlNoParameters.substring(0,noParamIndex);
+										
+										String codesvr = "";
+										if(Window.Location.getParameter("gwt.codesvr")!=null)
+											codesvr="&gwt.codesvr="+Window.Location.getParameter("gwt.codesvr");
+										
+										Window.Location.replace(wlNoParameters+"?tab=5"+codesvr);										
+									}
+									
+								});
+								
+								profileForm.submit();
+							}
+						});
+						
+						
+					}
+					else {
+						
+						// Add an edit button
+						profilePanel.add(profileButton = new Button("Edit Profile"));
+						
+						// Listen for when it is clicked
+						profileButton.addClickHandler(new ClickHandler(){
+							
+							@Override
+							public void onClick(ClickEvent event) {
+								// TODO Auto-generated method stub
+								
+								String wlNoParameters = Window.Location.getHref();
+								int noParamIndex =wlNoParameters.indexOf("?");
+								if(noParamIndex>=0)wlNoParameters = wlNoParameters.substring(0,noParamIndex);
+								
+								String codesvr = "";
+								if(Window.Location.getParameter("gwt.codesvr")!=null)
+									codesvr="&gwt.codesvr="+Window.Location.getParameter("gwt.codesvr");
+								
+								Window.Location.replace(wlNoParameters+"?tab=5&edit=true"+codesvr);
+							}
+						});
+					}
+					
+				}
+	
+				
+				// Get the info for the profile user
+				ssService.getUser(profileUser, new AsyncCallback(){
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+						profilePanel.add(new HTML(caught.getMessage()));
+					}
+
+					@Override
+					public void onSuccess(Object result) {
+						// TODO Auto-generated method stub
+							
+						UserInfo userObj = (UserInfo)result;
+						
+
+						
+						// Show we have nothing good
+						if(userObj==null)profilePanel.add(new HTML("No valid user given to show!"));
+						else{
+						
+						String[] fields = UserInfo.getFields();
+						
+						for(int i=0;i<fields.length;i++){
+							
+							Label lbl = new Label(fields[i]+": ");
+							Widget tb = editing ? new TextBox() : new Label(userObj.getField(fields[i]));
+							
+							// Set the name if we are editing
+							if(editing)((TextBox)tb).setName(fields[i]);
+							
+							// Add the elements
+							profilePanel.add(lbl);
+							profilePanel.add(tb);
+							
+							// ADd a line break
+							profilePanel.add(new HTML("<br/>"));
+						}
+						
+						}
+					}
+					
+					
+				});
+				
+			}
+			
+			
 			
 		}else{
 		
@@ -400,6 +691,9 @@ public class MyGig_Planner implements EntryPoint {
 			
 			home.add(new Label("Password:"));
 			home.add(tbPassword);
+			
+			home.add(new Label("Email:"));
+			home.add(tbEmail);
 			
 			home.add(new Label("Type:"));
 			home.add(lbType);
@@ -410,7 +704,6 @@ public class MyGig_Planner implements EntryPoint {
 		RootPanel.get().add(tp);
 		DOM.setElementAttribute(tp.getElement(), "id","mainTabPanel");
 	}
-	
 
 	public class CustomCallback implements AsyncCallback{
 		

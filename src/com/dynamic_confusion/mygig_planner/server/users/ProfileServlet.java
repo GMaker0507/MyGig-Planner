@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,68 +21,64 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
-import com.google.gwt.user.client.Cookies;
 
-public class RegistrationServlet extends HttpServlet {
-
+public class ProfileServlet extends HttpServlet {
 	private void processRequest(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-
-		resp.setContentType("text/html;charset=UTF-8");
+		
 		PrintWriter out = resp.getWriter();
 		
-		try{
-
-			// Get the username and password
-			String username = req.getParameter("username");
-			String email = req.getParameter("email");
-			String password = req.getParameter("password");
+		String user = req.getParameter("user");
+		
+		try {
 			
-			// Get the datastore
+			Date date = new Date(Integer.parseInt(req.getParameter("year")),
+								 Integer.parseInt(req.getParameter("month")),
+								 Integer.parseInt(req.getParameter("date")));
+						 
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 			
-			Collection<Filter> filterCompCollection = new ArrayList<Filter>();
+			Collection<Filter> filter = new ArrayList<Filter>();
 			
-			// Add the username/password predicates
-			filterCompCollection.add(new FilterPredicate("username",FilterOperator.EQUAL,username));
-			filterCompCollection.add(new FilterPredicate("email",FilterOperator.EQUAL,email));
+			// We want the date and username to match
+			filter.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,date));
+			filter.add(new FilterPredicate("bandName",FilterOperator.EQUAL,user));
 			
-			// Combine in one filter
-			CompositeFilter filterComp = new CompositeFilter(CompositeFilterOperator.OR,filterCompCollection);
+			// A query to get availabilities with the set iflters
+			Query getDate = new Query("Availability").setFilter(new CompositeFilter(CompositeFilterOperator.AND,filter));
 			
-			// Create the query
-			Query getUser = new Query("User").setFilter(filterComp);
+			PreparedQuery pqGetDate = datastore.prepare(getDate);
 			
-			// PRepare the query
-			PreparedQuery pqGetUser = datastore.prepare(getUser);
+			Entity dateEntity = null;
 			
-			// Try to get the entity
-			Entity userEntity = pqGetUser.asSingleEntity();
-			
-			if(userEntity==null){
+			// If we dont have an entity that matches
+			if((dateEntity = pqGetDate.asSingleEntity())==null){
 				
-				userEntity = new Entity("User",username);
+				// Create an entitiy for availabiility
+				dateEntity = new Entity("Availability");
 				
-				userEntity.setProperty("username",username);
-				userEntity.setProperty("password", password);
-				userEntity.setProperty("email",email);
+				// SEt the properties
+				dateEntity.setProperty("dateAvailable",date);
+				dateEntity.setProperty("bandName", user);
 				
-				datastore.put(userEntity);
+				// Add to the datastore
+				datastore.put(dateEntity);
+			}else{
 				
-				out.print("success");
-				
-			}else throw new Exception("That username/email is already in use.");
+				// Delete for mthe data store
+				datastore.delete(dateEntity.getKey());
+			}
 			
+			// Print success
+			out.print("success");
 			
-		}catch(Exception e){
+		} catch (Exception e) {
 			
-			out.println(e.getMessage());
-			
-			
-		}finally{
-			
-			out.close();
+			// TODO Auto-generated catch block
+			out.print(e.getMessage());
 		}
+		
+		out.close();
 	}
 	
 	@Override
@@ -91,7 +88,6 @@ public class RegistrationServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		processRequest(req, resp);
 	}
-	
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
