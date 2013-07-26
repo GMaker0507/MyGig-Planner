@@ -9,6 +9,7 @@ import com.dynamic_confusion.mygig_planner.client.GigInfo;
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
 import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideService;
+import com.dynamic_confusion.mygig_planner.client.ui.Genre;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -184,9 +185,9 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		// Add requirements if they were set
 		if(info.genre!=null)ands.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre));
 		if(info.hasPA)ands.add(new FilterPredicate("hasPA",FilterOperator.EQUAL,true));
-		if(info.hasSoundSystem)ands.add(new FilterPredicate("hasSoundSystem",FilterOperator.EQUAL,true));
-		if(info.originalMusic)ands.add(new FilterPredicate("originalMusic",FilterOperator.EQUAL,true));
-		if(info.hasHospitalityPack)ands.add(new FilterPredicate("requiresHospitalityPack",FilterOperator.EQUAL,true));
+		if(info.hasSoundPerson)ands.add(new FilterPredicate("hasSoundPerson",FilterOperator.EQUAL,true));
+		if(info.onlyOriginalMusic)ands.add(new FilterPredicate("onlyOriginalMusic",FilterOperator.EQUAL,true));
+		if(info.hasHospitalityPack)ands.add(new FilterPredicate("hasHospitalityPack",FilterOperator.EQUAL,true));
 		
 		CompositeFilter compFilter = null;
 
@@ -251,12 +252,7 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		UserInfo[] returnUsers = new UserInfo[sqEntities.size()];
 		
-		for(int i=0;i<returnUsers.length;i++){
-			
-			// Add the user 
-			returnUsers[i] = new UserInfo((String) sqEntities.get(i).getProperty("username"));
-			returnUsers[i].email = (String) sqEntities.get(i).getProperty("email");
-		}
+		setUsersFromEntities(returnUsers, sqEntities);
 		
 		
 		
@@ -291,12 +287,7 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		// Reformat the rray
 		users = new UserInfo[userEntities.size()];
 		
-		// For each user entity
-		for(int i=0;i<users.length;i++){
-			
-			// ADd the username ot the list
-			users[i] = new UserInfo((String) userEntities.get(i).getProperty("username"));
-		}
+		setUsersFromEntities(users, userEntities);
 		
 		// TODO Auto-generated method stub
 		return users;
@@ -339,17 +330,42 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		if(availableEntities==null)return null;
 	
 		users = new UserInfo[availableEntities.size()];
+	
+		// Set the arrayfrom the list
+		setUsersFromEntities(users,availableEntities);
+		
+		return users;
+	}
+	
+	private void setUsersFromEntities(UserInfo[] users,List<Entity> availableEntities){
+
 		
 		// For each user
 		for(int i=0;i<users.length;i++){
 			
 			// Create the user info entity
-			users[i] = new UserInfo((String) availableEntities.get(0).getProperty("username"));
+			users[i] = new UserInfo((String) availableEntities.get(i).getProperty("username"));
+			
+			// Get the other fields from the entity
+			setUserFromEntity(users[i],availableEntities.get(i));
 		}
 		
+	}
 	
+	private void setUserFromEntity(UserInfo user,Entity entity){
 		
-		return users;
+		// get the other user info fields
+		user.genre = (String) entity.getProperty("genre");
+		user.email = (String) entity.getProperty("email");
+		user.hasPA = (boolean) entity.getProperty("hasPA");
+		user.password = (String) entity.getProperty("password");
+		user.hasSoundPerson = (boolean) entity.getProperty("hasSoundPerson");
+		user.hasHospitalityPack = (boolean) entity.getProperty("hasHospitalityPack");
+		user.onlyOriginalMusic = (boolean) entity.getProperty("onlyOriginalMusic");
+		user.firstName = (String) entity.getProperty("firstName");
+		user.lastName = (String) entity.getProperty("lastName");
+		user.priceRange = (Double) entity.getProperty("priceRange");
+		user.openHours = (String) entity.getProperty("openHours");
 	}
 	
 	/**
@@ -383,6 +399,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		// Create the instance
 		UserInfo gotUser = new UserInfo(username);
+		
+		setUserFromEntity(gotUser, userEntity);
 		
 		// Return the instance
 		return gotUser;

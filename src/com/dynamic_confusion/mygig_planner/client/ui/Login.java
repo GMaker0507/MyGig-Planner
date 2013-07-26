@@ -79,7 +79,6 @@ public class Login extends Composite {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				// TODO Auto-generated method stub
-
 				
 				loginButton.setText("Login");
 				loginButton.setEnabled(true);

@@ -12,7 +12,7 @@ public class SearchInfo implements IsSerializable {
 	
 	public boolean isAvailable = false;
 	public boolean hasPA = false;
-	public boolean hasSoundSystem = false;
-	public boolean originalMusic = false;
+	public boolean hasSoundPerson = false;
+	public boolean onlyOriginalMusic = false;
 	public boolean hasHospitalityPack = false;
 }
