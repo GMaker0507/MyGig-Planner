@@ -244,7 +244,7 @@ public class MyGig_Planner implements EntryPoint {
 			public void onClick(ClickEvent event) {
 
 				
-				SearchInfo info = new SearchInfo(searchBox.getText());
+				SearchInfo info = new SearchInfo();
 				
 				// TODO populate other fields of the search info 
 				
@@ -653,7 +653,7 @@ public class MyGig_Planner implements EntryPoint {
 						for(int i=0;i<fields.length;i++){
 							
 							Label lbl = new Label(fields[i]+": ");
-							Widget tb = editing ? new TextBox() : new Label(userObj.getField(fields[i]));
+							Widget tb = editing ? new TextBox() : new Label(userObj.getField(fields[i]).toString());
 							
 							// Set the name if we are editing
 							if(editing)((TextBox)tb).setName(fields[i]);
