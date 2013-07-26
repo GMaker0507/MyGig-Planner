@@ -174,13 +174,89 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 	}
 	
 	@Override
-	public UserInfo search(SearchInfo info) {
+	public UserInfo[] search(SearchInfo info) {
 		// TODO Auto-generated method stub
-		return null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		List<Filter> ands = new ArrayList<Filter>();
+		
+		// Add requirements if they were set
+		if(info.genre!=null)ands.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre));
+		if(info.hasPA)ands.add(new FilterPredicate("hasPA",FilterOperator.EQUAL,true));
+		if(info.hasSoundSystem)ands.add(new FilterPredicate("hasSoundSystem",FilterOperator.EQUAL,true));
+		if(info.originalMusic)ands.add(new FilterPredicate("originalMusic",FilterOperator.EQUAL,true));
+		if(info.hasHospitalityPack)ands.add(new FilterPredicate("requiresHospitalityPack",FilterOperator.EQUAL,true));
+		
+		CompositeFilter compFilter = new CompositeFilter(CompositeFilterOperator.AND,ands);
+		
+		Query searchQuery = new Query("User").setFilter(compFilter);		
+		
+		PreparedQuery pqSearchQuery = datastore.prepare(searchQuery);
+		
+		List<Entity> sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(10));
+		
+		if(info.date!=null){
+			
+			Query dateQuery = null;
+			
+			List<Filter> dateOrs = new ArrayList<Filter>();
+			
+			for(int i=0;i<sqEntities.size();i++){
+				
+				// Add each band name
+				dateOrs.add(new FilterPredicate("bandName",FilterOperator.EQUAL,sqEntities.get(i).getProperty("username")));
+			}
+			
+			List<Filter> dateAnds = new ArrayList<Filter>();
+			
+			// Add matching one of the names
+			dateAnds.add(new CompositeFilter(CompositeFilterOperator.OR,dateOrs));	
+			
+			// Add matching the date
+			dateAnds.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,info.date));
+			
+			// Search for availability
+			dateQuery = new Query("Availability").setFilter(new CompositeFilter(CompositeFilterOperator.AND,dateAnds));
+			
+			PreparedQuery pqDateQuery = datastore.prepare(dateQuery);
+			
+			List<Entity> dqEntities = pqDateQuery.asList(FetchOptions.Builder.withDefaults());
+			
+			List<Filter> userDateOrs = new ArrayList<Filter>();
+			
+			for(int i=0;i<sqEntities.size();i++){
+				
+				// Add each band name
+				dateOrs.add(new FilterPredicate("username",FilterOperator.EQUAL,dqEntities.get(i).getProperty("bandName")));
+			}
+			
+			CompositeFilter compFilterDate = new CompositeFilter(CompositeFilterOperator.OR,userDateOrs);
+		
+			// Recreatthe query
+			searchQuery = new Query("User").setFilter(compFilterDate);
+
+			// Re-prepare the query
+			pqSearchQuery = datastore.prepare(searchQuery);
+			
+			// Get new entities
+			sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(10));
+		}
+		
+		UserInfo[] returnUsers = new UserInfo[sqEntities.size()];
+		
+		for(int i=0;i<returnUsers.length;i++){
+			
+			
+		}
+		
+		
+		
+		return returnUsers;
 	}
 	
 	@Override
-	public UserInfo search(SearchInfo info, int limit, int offset) {
+	public UserInfo[] search(SearchInfo info, int limit, int offset) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -16,8 +16,8 @@ public interface ServerSideService extends RemoteService {
 	
 	Date[] getDatesAvailable(String username, Date start, Date end);
 
-	UserInfo search(SearchInfo info);
-	UserInfo search(SearchInfo info,int limit, int offset);
+	UserInfo[] search(SearchInfo info);
+	UserInfo[] search(SearchInfo info,int limit, int offset);
 
 	String getErrorMessage();
 	

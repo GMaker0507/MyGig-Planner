@@ -11,11 +11,10 @@ public class UserInfo implements Serializable {
 	
 	public String description = "We are a band!";
 	
-	public String requirements = "";
+	public String[] requirements = null;
+	public String[] genres = null;
 	
 	public UserInfo(){
-		
-		
 	}
 	
 	public UserInfo(String username) {
@@ -26,16 +25,16 @@ public class UserInfo implements Serializable {
 
 	public static String[] getFields() {
 		// TODO Auto-generated method stub
-		return new String[]{"username","password","email","description","requirements"};
+		return new String[]{"username","password","email","description"};
 	}
 
-	public String getField(String field) {
+	public Object getField(String field) {
 		// TODO Auto-generated method stub
 		if(field.equals("username"))return username;
 		if(field.equals("password"))return password;
 		if(field.equals("email"))return email;
 		if(field.equals("description"))return description;
-		if(field.equals("requirements"))return requirements;
+		if(field.equals("genres"))return genres;
 		return null;
 	}
 

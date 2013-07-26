@@ -1,20 +1,18 @@
 package com.dynamic_confusion.mygig_planner.client;
 
+import java.util.Date;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class SearchInfo implements IsSerializable {
-
-	public String searchString = "";
 	
-	public int genre = 0;
-	public boolean available = false;
+	public String genre = "";
 	
-	public SearchInfo(){
-		
-	}
+	public Date date = null;
 	
-	public SearchInfo(String str){
-		
-		searchString = str;
-	}
+	public boolean isAvailable = false;
+	public boolean hasPA = false;
+	public boolean hasSoundSystem = false;
+	public boolean originalMusic = false;
+	public boolean hasHospitalityPack = false;
 }

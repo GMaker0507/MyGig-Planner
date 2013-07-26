@@ -43,10 +43,10 @@ public class AvailabilityServlet extends HttpServlet {
 			
 			// We want the date and username to match
 			filter.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,date));
-			filter.add(new FilterPredicate("bandName",FilterOperator.EQUAL,user));
+			filter.add(new FilterPredicate("username",FilterOperator.EQUAL,user));
 			
 			// A query to get availabilities with the set iflters
-			Query getDate = new Query("Availability").setFilter(new CompositeFilter(CompositeFilterOperator.AND,filter));
+			Query getDate = new Query("User").setFilter(new CompositeFilter(CompositeFilterOperator.AND,filter));
 			
 			PreparedQuery pqGetDate = datastore.prepare(getDate);
 			
@@ -76,7 +76,7 @@ public class AvailabilityServlet extends HttpServlet {
 		} catch (Exception e) {
 			
 			// TODO Auto-generated catch block
-			out.print(e.getMessage());
+			out.print(e);
 		}
 		
 		out.close();

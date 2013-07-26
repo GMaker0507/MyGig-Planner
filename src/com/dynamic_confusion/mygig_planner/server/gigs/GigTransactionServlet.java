@@ -23,10 +23,7 @@ public class GigTransactionServlet extends HttpServlet {
 	private void processRequest(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		
-		PrintWriter out = resp.getWriter();		
-		
-			
-		String postfix = req.getPathInfo().substring(1);
+		PrintWriter out = resp.getWriter();
 
 		String action = req.getParameter("action");
 		
@@ -59,11 +56,11 @@ public class GigTransactionServlet extends HttpServlet {
 			} catch (Exception e) {
 	
 	
-				out.println("failure: "+postfix);
 				out.println("failure: "+id);
 				out.println("failure: "+username);
 			}
 			
+		// If we are sending
 		}else if(action.equals("send")){
 			
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
