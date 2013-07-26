@@ -1,7 +1,9 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -11,6 +13,8 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
 public class Login extends Composite {
 
@@ -56,12 +60,42 @@ public class Login extends Composite {
 		// Login button 
 		final Button loginButton = new Button("Log In");
 		flexTable.setWidget(4, 0, loginButton);
-		loginButton.addClickHandler(new ClickHandler() {
+		
+		loginButton.addClickHandler(new ClickHandler(){
+			
+			@Override
 			public void onClick(ClickEvent event) {
+
+				// Submit the form
+				loginForm.submit();
+			}
+		});
+		
+		loginForm.addSubmitCompleteHandler(new SubmitCompleteHandler(){
+			
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				// TODO Auto-generated method stub
 				
-				if (userTextBox.getText().length() == 0 || passwordTextBox.getText().length() == 0) {
-						Window.alert("Username or password is empty."); 	
+				String loginResults = event.getResults().trim();
+				
+				// If it says success
+				if(loginResults.equalsIgnoreCase("success")){
+					
+					// Set the cookie
+					Cookies.setCookie("activeUser", userTextBox.getText());	
+					
+					// Reload
+					Window.Location.reload();
+					
+				}else{
+
+					String errorMessage = loginResults;
+					
+					// TODO handle output of error message
+					//loginPanel.add(new HTML(errorMessage));
 				}
+				
 			}
 		});
 

@@ -111,7 +111,7 @@ public class Register extends Composite {
 					
 					// TODO handle output of error message
 					
-					home.add(new HTML(errorMessage));
+					//home.add(new HTML(errorMessage));
 				}
 			}
 		});
