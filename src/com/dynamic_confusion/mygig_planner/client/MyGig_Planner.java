@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
+import com.dynamic_confusion.mygig_planner.client.ui.Login;
+import com.dynamic_confusion.mygig_planner.client.ui.Register;
+import com.dynamic_confusion.mygig_planner.client.ui.Search;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,11 +30,13 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DatePicker;
 
@@ -118,27 +123,14 @@ public class MyGig_Planner implements EntryPoint {
 			tp.add(logbook,"Logbook");
 			tp.add(new HTML("tab 1"),"Calender");
 			tp.add(profileForm,"View/Edit Profile");
-			tp.add(search,"Search/Browse");
+			tp.add(new Search(ssService),"Search/Browse");
+			tp.add(search,"Allen is a Search Desk");
 		
-		}else tp.add(loginForm,"Login");
+		}//else tp.add(loginForm,"Login");
 		
 		tp.add(new HTML("tab 3"),"Help");
 		tp.add(filesGrid,"Project Files & Information");
 		
-		final TextBox tbUsername = new TextBox();
-		final TextBox tbPassword = new TextBox();
-		final TextBox tbEmail = new TextBox();
-		final ListBox lbType = new ListBox();
-		
-		// Add the two possible types
-		lbType.addItem("Venue");
-		lbType.addItem("Musician");
-		
-		// Set the name for the form		
-		lbType.setName("type");
-		tbEmail.setName("email");
-		tbPassword.setName("password");
-		tbUsername.setName("username");
 		
 		// A button for registering
 		final Button registerButton = new Button("Register");
@@ -685,20 +677,26 @@ public class MyGig_Planner implements EntryPoint {
 			
 			
 		}else{
-		
-			home.add(new Label("Username:"));		
-			home.add(tbUsername);
 			
-			home.add(new Label("Password:"));
-			home.add(tbPassword);
+			HorizontalPanel horizontalPanel = new HorizontalPanel();
+			home.add(horizontalPanel);
 			
-			home.add(new Label("Email:"));
-			home.add(tbEmail);
+			// Adding the login section
+			// login button is implemented in Login class
+			Login loginSection = new Login();
+			horizontalPanel.add(loginSection);
 			
-			home.add(new Label("Type:"));
-			home.add(lbType);
+			// Adding space between login and register section
+			VerticalPanel spacePanel = new VerticalPanel();
+			Label spacing = new Label("");
+			spacing.setStyleName("gwt-Label-Header");
+			spacePanel.add(spacing);
+			horizontalPanel.add(spacePanel);
 			
-			home.add(registerButton);
+			// Adding the register section
+			// register button is implemented in Register class
+			Register registerSection = new Register();
+			horizontalPanel.add(registerSection);	
 		}
 		
 		RootPanel.get().add(tp);

@@ -42,3 +42,25 @@ body{
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+.gwt-Label-Login {
+	color: Black;
+	font-size: 16px;
+	font-style: normal;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.gwt-Label-Header {
+	color: Purple;
+	border: medium;
+	font-stretch: wider;
+	font-size: 24px;
+	font-family: Arial;
+	font-weight: bolder;
+	vertical-align: middle;
+	letter-spacing: 1px;
+	word-spacing: 2px;
+	background-color: Silver;
+	table-layout: auto;
+}
