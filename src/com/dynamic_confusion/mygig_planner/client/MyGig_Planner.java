@@ -231,7 +231,7 @@ public class MyGig_Planner implements EntryPoint {
 		
 		loginPanel.add(loginButton);
 		
-		Button searchButton = new Button("Search!");
+		final Button searchButton = new Button("Search!");
 		Button addDateButton = new Button("Add Date");
 		
 		final TextBox searchBox = new TextBox();
@@ -244,6 +244,9 @@ public class MyGig_Planner implements EntryPoint {
 			public void onClick(ClickEvent event) {
 
 				
+				searchButton.setText("Searching...");
+				searchButton.setEnabled(false);
+				
 				SearchInfo info = new SearchInfo();
 				
 				// TODO populate other fields of the search info 
@@ -255,16 +258,24 @@ public class MyGig_Planner implements EntryPoint {
 					@Override
 					public void onFailure(Throwable caught) {
 						
-						
+						RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
 					}
 					
 					@Override
 					public void onSuccess(Object result) {
-
+						
 						UserInfo[] users = (UserInfo[])result;
 						
-						// TODO handle search results
+						searchButton.setText("Search");
+						searchButton.setEnabled(true);
 						
+						RootPanel.get().add(new HTML("Done with "+users.length+" results!"));
+						
+						// TODO handle search results
+						for(int i=0;i<users.length;i++){
+
+							RootPanel.get().add(new HTML("<p>"+users[i].username+"</p>"));
+						}
 						
 					}
 					

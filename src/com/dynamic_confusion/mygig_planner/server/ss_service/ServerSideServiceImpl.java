@@ -174,7 +174,7 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 	}
 	
 	@Override
-	public UserInfo[] search(SearchInfo info) {
+	public UserInfo[] search(SearchInfo info, int limit, int offset) {
 		// TODO Auto-generated method stub
 		
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -188,13 +188,19 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		if(info.originalMusic)ands.add(new FilterPredicate("originalMusic",FilterOperator.EQUAL,true));
 		if(info.hasHospitalityPack)ands.add(new FilterPredicate("requiresHospitalityPack",FilterOperator.EQUAL,true));
 		
-		CompositeFilter compFilter = new CompositeFilter(CompositeFilterOperator.AND,ands);
+		CompositeFilter compFilter = null;
+
+		Query searchQuery = null;
 		
-		Query searchQuery = new Query("User").setFilter(compFilter);		
+		if(ands.size()>1){
+			compFilter = new CompositeFilter(CompositeFilterOperator.AND,ands);
+			searchQuery = new Query("User").setFilter(compFilter);	
+		}else if(ands.size()==1)searchQuery = new Query("User").setFilter(ands.get(0));	
+		else searchQuery = new Query("User");
 		
 		PreparedQuery pqSearchQuery = datastore.prepare(searchQuery);
 		
-		List<Entity> sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(10));
+		List<Entity> sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(limit).offset(limit*offset));
 		
 		if(info.date!=null){
 			
@@ -240,14 +246,16 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			pqSearchQuery = datastore.prepare(searchQuery);
 			
 			// Get new entities
-			sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(10));
+			sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withDefaults());
 		}
 		
 		UserInfo[] returnUsers = new UserInfo[sqEntities.size()];
 		
 		for(int i=0;i<returnUsers.length;i++){
 			
-			
+			// Add the user 
+			returnUsers[i] = new UserInfo((String) sqEntities.get(i).getProperty("username"));
+			returnUsers[i].email = (String) sqEntities.get(i).getProperty("email");
 		}
 		
 		
@@ -256,9 +264,9 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 	}
 	
 	@Override
-	public UserInfo[] search(SearchInfo info, int limit, int offset) {
+	public UserInfo[] search(SearchInfo info) {
 		// TODO Auto-generated method stub
-		return null;
+		return search(info,10,0);
 	}
 	
 
@@ -301,49 +309,45 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		UserInfo[] users = new UserInfo[0];		
 		
-		try{
 			
-			// Get a ref to the datastore
-			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-			
-			// Initiate the filter
-			Collection<Filter> datesFilter = new ArrayList<Filter>();
-			
-			// For each date
-			for(int i=0;i<datesAvailable.length;i++){
+		// Get a ref to the datastore
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Initiate the filter
+		Collection<Filter> datesFilter = new ArrayList<Filter>();
+		
+		// For each date
+		for(int i=0;i<datesAvailable.length;i++){
 
-				// Get the current date
-				Date dateAvailable = datesAvailable[i];
-				
-				// Add to the predicate
-				datesFilter.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,dateAvailable));
-			}
+			// Get the current date
+			Date dateAvailable = datesAvailable[i];
 			
-			// Create a query for the username of a user
-			Query get = new Query("Availibility").setFilter(new CompositeFilter(CompositeFilterOperator.AND, datesFilter));
-			
-			// Prepare the query
-			PreparedQuery pqGet = datastore.prepare(get);
-			
-			// Get the entity
-			List<Entity> availableEntities = pqGet.asList(FetchOptions.Builder.withDefaults());
-			
-			// Make sure we have a value
-			if(availableEntities==null)return null;
-			
-			users = new UserInfo[availableEntities.size()];
-			
-			// For each user
-			for(int i=0;i<users.length;i++){
-				
-				// Create the user info entity
-				users[i] = new UserInfo((String) availableEntities.get(0).getProperty("username"));
-			}
-			
-		}catch(Exception e){
-			
-			users = new UserInfo[0];
+			// Add to the predicate
+			datesFilter.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,dateAvailable));
 		}
+		
+		// Create a query for the username of a user
+		Query get = new Query("Availibility").setFilter(new CompositeFilter(CompositeFilterOperator.AND, datesFilter));
+		
+		// Prepare the query
+		PreparedQuery pqGet = datastore.prepare(get);
+		
+		// Get the entity
+		List<Entity> availableEntities = pqGet.asList(FetchOptions.Builder.withDefaults());
+		
+		// Make sure we have a value
+		if(availableEntities==null)return null;
+	
+		users = new UserInfo[availableEntities.size()];
+		
+		// For each user
+		for(int i=0;i<users.length;i++){
+			
+			// Create the user info entity
+			users[i] = new UserInfo((String) availableEntities.get(0).getProperty("username"));
+		}
+		
+	
 		
 		return users;
 	}
