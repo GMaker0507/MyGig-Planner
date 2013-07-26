@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
+import com.dynamic_confusion.mygig_planner.client.ui.Calendar;
 import com.dynamic_confusion.mygig_planner.client.ui.Login;
 import com.dynamic_confusion.mygig_planner.client.ui.Register;
 import com.dynamic_confusion.mygig_planner.client.ui.Search;
@@ -75,21 +76,18 @@ public class MyGig_Planner implements EntryPoint {
 		final AbsolutePanel search = new AbsolutePanel();
 		final AbsolutePanel loginPanel = new AbsolutePanel();
 		final AbsolutePanel logbook = new AbsolutePanel();
+		final AbsolutePanel gigCalendar = new AbsolutePanel();
 		
 		
 		final FormPanel form = new FormPanel();
 		final FormPanel profileForm = new FormPanel();
-		final FormPanel loginForm = new FormPanel();
 		
 		profileForm.setWidget(profilePanel);
 		profileForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		profileForm.setMethod(FormPanel.METHOD_POST);
 		profileForm.setAction("/server-side/profile");
 		
-		loginForm.setWidget(loginPanel);
-		loginForm.setEncoding(FormPanel.ENCODING_URLENCODED);
-		loginForm.setMethod(FormPanel.METHOD_GET);
-		loginForm.setAction("/login");
+		
 		
 		form.setWidget(home);
 		form.setEncoding(FormPanel.ENCODING_URLENCODED);
@@ -121,7 +119,7 @@ public class MyGig_Planner implements EntryPoint {
 			});
 		
 			tp.add(logbook,"Logbook");
-			tp.add(new HTML("tab 1"),"Calender");
+			tp.add(gigCalendar,"Calendar");
 			tp.add(profileForm,"View/Edit Profile");
 			tp.add(new Search(ssService),"Search/Browse");
 			tp.add(search,"Allen is a Search Desk");
@@ -131,11 +129,6 @@ public class MyGig_Planner implements EntryPoint {
 		tp.add(new HTML("tab 3"),"Help");
 		tp.add(filesGrid,"Project Files & Information");
 		
-		
-		// A button for registering
-		final Button registerButton = new Button("Register");
-		final Button loginButton = new Button("Login");
-		
 		final TextBox tbLoginUsername = new TextBox();
 		final TextBox tbLoginPassword = new TextBox();
 		
@@ -143,18 +136,6 @@ public class MyGig_Planner implements EntryPoint {
 		tbLoginPassword.setName("username");
 		tbLoginUsername.setName("password");
 		
-
-		registerButton.addClickHandler(new ClickHandler(){
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				
-				// Submit the form
-				form.submit();
-				
-				
-			}
-		});
 		
 		form.addSubmitCompleteHandler(new SubmitCompleteHandler(){
 			
@@ -185,52 +166,6 @@ public class MyGig_Planner implements EntryPoint {
 			}
 		});
 					
-		loginButton.addClickHandler(new ClickHandler(){
-			
-			@Override
-			public void onClick(ClickEvent event) {
-
-				// Submit the form
-				loginForm.submit();
-			}
-		});
-		
-		loginForm.addSubmitCompleteHandler(new SubmitCompleteHandler(){
-			
-			@Override
-			public void onSubmitComplete(SubmitCompleteEvent event) {
-				// TODO Auto-generated method stub
-				
-				String loginResults = event.getResults().trim();
-				
-				// If it says success
-				if(loginResults.equalsIgnoreCase("success")){
-					
-					// Set the cookie
-					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
-					
-					// Reload
-					Window.Location.reload();
-					
-				}else{
-
-					String errorMessage = loginResults;
-					
-					// TODO handle output of error message
-					loginPanel.add(new HTML(errorMessage));
-				}
-				
-			}
-		});
-		
-		loginPanel.add(new Label("Username:"));		
-		loginPanel.add(tbLoginUsername);
-		
-		loginPanel.add(new Label("Password:"));
-		loginPanel.add(tbLoginPassword);
-		
-		loginPanel.add(loginButton);
-		
 		final Button searchButton = new Button("Search!");
 		Button addDateButton = new Button("Add Date");
 		
@@ -423,22 +358,22 @@ public class MyGig_Planner implements EntryPoint {
 							}else if(gigs[i].status==-1&&
 							    gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))){
 								
-								// Alert the user what happend
+								// Alert the user what happened
 								logbook.add(new HTML("<p>You rejected "+gigs[i].sendUser+"'s Offer on "+gigs[i].dateReplied+"</p>"));
 							}else if(gigs[i].status==1&&
 							    gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))){
 								
-								// Alert the user what happend
+								// Alert the user what happened
 								logbook.add(new HTML("<p>You accepted "+gigs[i].sendUser+"'s Offer on "+gigs[i].dateReplied+"</p>"));
 							}else if(gigs[i].status==-1&&
 							    gigs[i].sendUser.equals(Cookies.getCookie("activeUser"))){
 								
-								// Alert the user what happend
+								// Alert the user what happened
 								logbook.add(new HTML("<p>"+gigs[i].recipientUser+"rejected your offer on "+gigs[i].dateReplied+"</p>"));
 							}else if(gigs[i].status==1&&
 							    gigs[i].sendUser.equals(Cookies.getCookie("activeUser"))){
 								
-								// Alert the user what happend
+								// Alert the user what happened
 								logbook.add(new HTML("<p>"+gigs[i].recipientUser+" accepted your offer on "+gigs[i].dateReplied+"</p>"));
 							}
 						}
@@ -553,14 +488,21 @@ public class MyGig_Planner implements EntryPoint {
 				
 			});
 			
+			// Start adding to gigCalendar tab
+			HorizontalPanel calendarPanel = new HorizontalPanel();
+			gigCalendar.add(calendarPanel);
+			Calendar calendar = new Calendar();
+			gigCalendar.add(calendar);
+			
 			String profileUser = Window.Location.getParameter("user") ==null ? Cookies.getCookie("activeUser") : Window.Location.getParameter("user");
 			
 			// If we have a bad profile user
-			if(profileUser==null){
+			if (profileUser==null) {
 				
 				// Show we have nothing good
 				profilePanel.add(new HTML("No valid user given to show!"));
-			}else{
+			}
+			else {
 				
 				// ARe we editing
 				final boolean editing = (Window.Location.getParameter("user")==null||

@@ -161,6 +161,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 				gigs[i].recipientUser=((String) gigEntities.get(i).getProperty("recipientUser"));
 				gigs[i].status=(Integer.parseInt(""+gigEntities.get(i).getProperty("status")));
 				gigs[i].name=((String)gigEntities.get(i).getProperty("name"));
+				gigs[i].dateSent = (Date)gigEntities.get(i).getProperty("dateSent");
+				gigs[i].dateReplied = (Date)gigEntities.get(i).getProperty("dateReplied");
 			}
 			
 		}catch(Exception e){
