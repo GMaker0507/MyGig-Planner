@@ -30,7 +30,6 @@ public class Register extends Composite {
 		openhoursTextBox.setName("openHours");	genreTextBox.setName("genre");
 		capacityTextBox.setName("capacity");	pricerangeTextBox.setName("priceRange");
 		
-		
 		// Create a form panel
 		final FormPanel registerForm = new FormPanel();
 		//form.setAction("/myFormHandler");
@@ -96,15 +95,16 @@ public class Register extends Composite {
 				String registerResults = event.getResults().trim();
 				
 				// If it says success
-				if(registerResults.equals("success")){
+				if (registerResults.equals("success")) {
 					
-					// Setthe cookie
+					// Set the cookie
 					Cookies.setCookie("activeUser", userTextBox.getText());	
 					
 					// Reload
 					Window.Location.reload();
 
-				}else{
+				}
+				else {
 
 
 					String errorMessage = registerResults;

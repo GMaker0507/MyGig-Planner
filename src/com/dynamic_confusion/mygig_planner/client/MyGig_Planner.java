@@ -89,12 +89,12 @@ public class MyGig_Planner implements EntryPoint {
 		loginForm.setWidget(loginPanel);
 		loginForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		loginForm.setMethod(FormPanel.METHOD_GET);
-		loginForm.setAction("/server-side/login");
+		loginForm.setAction("/login");
 		
 		form.setWidget(home);
 		form.setEncoding(FormPanel.ENCODING_URLENCODED);
 		form.setMethod(FormPanel.METHOD_POST);
-		form.setAction("/server-side/registration");
+		form.setAction("/registration");
 		
 		// Add some default panels
 		tp.add(form,"Home");
@@ -167,7 +167,7 @@ public class MyGig_Planner implements EntryPoint {
 				// If it says success
 				if(registerResults.equals("success")){
 					
-					// Setthe cookie
+					// Set the cookie
 					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
 					
 					// Reload
@@ -206,7 +206,7 @@ public class MyGig_Planner implements EntryPoint {
 				// If it says success
 				if(loginResults.equalsIgnoreCase("success")){
 					
-					// Setthe cookie
+					// Set the cookie
 					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
 					
 					// Reload
@@ -698,11 +698,9 @@ public class MyGig_Planner implements EntryPoint {
 			horizontalPanel.add(loginSection);
 			
 			// Adding space between login and register section
-			VerticalPanel spacePanel = new VerticalPanel();
-			Label spacing = new Label("");
-			spacing.setStyleName("gwt-Label-Header");
-			spacePanel.add(spacing);
-			horizontalPanel.add(spacePanel);
+			VerticalPanel spacing = new VerticalPanel();
+			spacing.setWidth("200px");
+			horizontalPanel.add(spacing);
 			
 			// Adding the register section
 			// register button is implemented in Register class

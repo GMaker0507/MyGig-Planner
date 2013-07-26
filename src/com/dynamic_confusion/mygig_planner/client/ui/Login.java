@@ -4,6 +4,7 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -99,7 +100,7 @@ public class Login extends Composite {
 					String errorMessage = loginResults;
 					
 					// TODO handle output of error message
-					//((FormPanel)event.getSource()).add(new HTML(errorMessage));
+					RootPanel.get().add(new HTML(errorMessage));
 				}
 				
 			}

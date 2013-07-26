@@ -77,12 +77,9 @@ public class UserInfo implements Serializable {
 		int m12 = (int)(Math.random()*((double)9));
 		int m22 = (int)(Math.random()*((double)9));
 		
-		if(Math.random()>0.5){
-			
-			openHours = h+":"+m1+""+m2+(Math.random()>0.5?"AM":"PM") +" - "+
-						h2+":"+m12+""+m22+(Math.random()>0.5?"AM":"PM");
-		}
-		
+		openHours = h+":"+m1+""+m2+(Math.random()>0.5?"AM":"PM") +" - "+
+					h2+":"+m12+""+m22+(Math.random()>0.5?"AM":"PM");
+	
 		password = "password";
 	}
 	
