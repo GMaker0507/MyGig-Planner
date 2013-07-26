@@ -25,10 +25,10 @@ public class Register extends Composite {
 		
 		// Set names for the form
 		userTextBox.setName("username");		passTextBox.setName("password");			verpassTextBox.setName("verifypassword");
-		fnameTextBox.setName("firstname");		lnameTextBox.setName("lastname");
-		addressTextBox.setName("address");		phonenumberTextBox.setName("phonenumber");
-		openhoursTextBox.setName("openhours");	genreTextBox.setName("genre");
-		capacityTextBox.setName("capacity");	pricerangeTextBox.setName("pricerange");
+		fnameTextBox.setName("firstName");		lnameTextBox.setName("lastName");
+		addressTextBox.setName("address");		phonenumberTextBox.setName("phoneNumber");
+		openhoursTextBox.setName("openHours");	genreTextBox.setName("genre");
+		capacityTextBox.setName("capacity");	pricerangeTextBox.setName("priceRange");
 		
 		
 		// Create a form panel
@@ -41,7 +41,7 @@ public class Register extends Composite {
 		registerForm.setWidget(verticalPanel);
 		registerForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		registerForm.setMethod(FormPanel.METHOD_POST);
-		registerForm.setAction("/server-side/registration");
+		registerForm.setAction("/registration");
 		
 		Label lblRegisterHeading = new Label("New User? Start here!");
 		lblRegisterHeading.setStyleName("gwt-Label-Header");

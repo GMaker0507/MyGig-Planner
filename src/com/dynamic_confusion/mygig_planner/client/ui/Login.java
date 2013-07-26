@@ -29,7 +29,7 @@ public class Login extends Composite {
 		loginForm.setWidget(verticalPanel);
 		loginForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		loginForm.setMethod(FormPanel.METHOD_GET);
-		loginForm.setAction("/server-side/login");
+		loginForm.setAction("/login");
 		
 		Label label0 = new Label("Log In");
 		label0.setStyleName("gwt-Label-Header");
@@ -65,6 +65,9 @@ public class Login extends Composite {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				
+				loginButton.setText("Proccessing...");
+				loginButton.setEnabled(false);
 
 				// Submit the form
 				loginForm.submit();
@@ -76,6 +79,9 @@ public class Login extends Composite {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				// TODO Auto-generated method stub
+				
+				loginButton.setText("Login");
+				loginButton.setEnabled(true);
 				
 				String loginResults = event.getResults().trim();
 				
@@ -93,7 +99,7 @@ public class Login extends Composite {
 					String errorMessage = loginResults;
 					
 					// TODO handle output of error message
-					//loginPanel.add(new HTML(errorMessage));
+					//((FormPanel)event.getSource()).add(new HTML(errorMessage));
 				}
 				
 			}
