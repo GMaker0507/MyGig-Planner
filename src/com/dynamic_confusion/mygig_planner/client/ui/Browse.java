@@ -103,25 +103,25 @@ public class Browse extends Composite {
 			absolutePanel.add(chckbxPop, 10, 130);
 			
 			CheckBox chckbxCountry = new CheckBox("Country");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 150);
 
 			CheckBox chckbxSka = new CheckBox("Ska");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 170);
 			
 			CheckBox chckbxReggae = new CheckBox("Reggae");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 190);
 
 			CheckBox chckbxBluegrass = new CheckBox("Bluegrass");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 210);
 
 			CheckBox chckbxHiphop = new CheckBox("Hiphop");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 230);
 
 			CheckBox chckbxIndustrial = new CheckBox("Industrial");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 250);
 
 			CheckBox chckbxRockabilly = new CheckBox("Rockabilly");
-			absolutePanel.add(chckbxCountry, 10, 156);
+			absolutePanel.add(chckbxCountry, 10, 270);
 		}
 		
 		
