@@ -193,10 +193,17 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 
 		Query searchQuery = null;
 		
+		// If we have more than one
 		if(ands.size()>1){
+			
+			// Get filter for all
 			compFilter = new CompositeFilter(CompositeFilterOperator.AND,ands);
 			searchQuery = new Query("User").setFilter(compFilter);	
+			
+		// Get the users for the first filter
 		}else if(ands.size()==1)searchQuery = new Query("User").setFilter(ands.get(0));	
+		
+		// Get all users
 		else searchQuery = new Query("User");
 		
 		PreparedQuery pqSearchQuery = datastore.prepare(searchQuery);
@@ -252,9 +259,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		UserInfo[] returnUsers = new UserInfo[sqEntities.size()];
 		
-		setUsersFromEntities(returnUsers, sqEntities);
-		
-		
+		// Set users from the found entities
+		setUsersFromEntities(returnUsers, sqEntities);		
 		
 		return returnUsers;
 	}

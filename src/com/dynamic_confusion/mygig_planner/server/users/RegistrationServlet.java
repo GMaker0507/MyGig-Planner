@@ -50,6 +50,7 @@ public class RegistrationServlet extends HttpServlet {
 			
 			// Set the other user entity properties
 			newUser.setProperty("username", req.getParameter("username"));
+			newUser.setProperty("type", req.getParameter("venue"));
 			newUser.setProperty("email", req.getParameter("email"));
 			newUser.setProperty("genre", req.getParameter("genre"));
 			newUser.setProperty("password", req.getParameter("password"));
@@ -74,7 +75,7 @@ public class RegistrationServlet extends HttpServlet {
 		
 		out.close();
 	}
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
