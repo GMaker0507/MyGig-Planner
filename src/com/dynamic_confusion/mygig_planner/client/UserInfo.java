@@ -66,6 +66,23 @@ public class UserInfo implements Serializable {
 		username = emails1[(int) ((int)(Math.random()*((double)emails1.length)))]+
 				emails2[(int) ((int)(Math.random()*((double)emails2.length)))]+emails3;
 		
+		int h = (int)(Math.random()*((double)11))+1;
+		
+		int m1 = (int)(Math.random()*((double)9));
+		int m2 = (int)(Math.random()*((double)9));
+		
+
+		int h2 = (int)(Math.random()*((double)11))+1;
+		
+		int m12 = (int)(Math.random()*((double)9));
+		int m22 = (int)(Math.random()*((double)9));
+		
+		if(Math.random()>0.5){
+			
+			openHours = h+":"+m1+""+m2+(Math.random()>0.5?"AM":"PM") +" - "+
+						h2+":"+m12+""+m22+(Math.random()>0.5?"AM":"PM");
+		}
+		
 		password = "password";
 	}
 	
