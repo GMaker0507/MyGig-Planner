@@ -81,7 +81,7 @@ public class Login extends Composite {
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				// TODO Auto-generated method stub
 				
-				loginButton.setText("Login");
+				loginButton.setText("Wait...");
 				loginButton.setEnabled(true);
 				
 				String loginResults = event.getResults().trim();

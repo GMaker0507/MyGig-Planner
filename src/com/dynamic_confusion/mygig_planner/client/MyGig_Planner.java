@@ -33,7 +33,6 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -74,10 +73,7 @@ public class MyGig_Planner implements EntryPoint {
 		final AbsolutePanel home = new AbsolutePanel();
 		final AbsolutePanel profilePanel = new AbsolutePanel();
 		final AbsolutePanel search = new AbsolutePanel();
-		final AbsolutePanel loginPanel = new AbsolutePanel();
 		final AbsolutePanel logbook = new AbsolutePanel();
-		final AbsolutePanel gigCalendar = new AbsolutePanel();
-		
 		
 		final FormPanel form = new FormPanel();
 		final FormPanel profileForm = new FormPanel();
@@ -114,17 +110,13 @@ public class MyGig_Planner implements EntryPoint {
 					
 					// Reload the page
 					Window.Location.reload();
-					
 				}
 			});
 		
 			tp.add(logbook,"Logbook");
-			tp.add(gigCalendar,"Calendar");
 			tp.add(profileForm,"View/Edit Profile");
 			tp.add(new Search(ssService),"Search/Browse");
-			tp.add(search,"Allen is a Search Desk");
-		
-		}//else tp.add(loginForm,"Login");
+		}
 		
 		tp.add(new HTML("tab 3"),"Help");
 		tp.add(filesGrid,"Project Files & Information");
@@ -238,12 +230,17 @@ public class MyGig_Planner implements EntryPoint {
 				
 				public void onSuccess(Object result) {
 					
-					final UserInfo[] users = (UserInfo[])result;
+					// Start adding to calendar to home tab
+					HorizontalPanel calendarPanel = new HorizontalPanel();
+					Calendar calendar = new Calendar();
+					calendarPanel.add(calendar);
+					home.add(calendarPanel);
 					
-
+					//final UserInfo[] users = (UserInfo[])result;
 					
-					home.add(new HTML("<h3>Users</h3>"));
+					//home.add(new HTML("<h3>Users</h3>"));
 					
+					/*
 					for(int i=0;i<users.length;i++){
 						
 						final String currentUserGridUser = users[i].username;
@@ -282,14 +279,12 @@ public class MyGig_Planner implements EntryPoint {
 									}
 									
 								});
-								
-								
 							}
 						});
 						
 						//<a href=\""+GWT.getModuleBaseURL()+"sendOffer\">Send an Offer</a>");
-						
 					}
+					*/
 				};
 			});
 			
@@ -402,7 +397,7 @@ public class MyGig_Planner implements EntryPoint {
 				@Override
 				public void onSuccess(Object result) {
 					// TODO Auto-generated method stub
-					
+					/*
 					Date[] dates = (Date[])result;
 					
 					Grid calender = new Grid(5,7);
@@ -482,17 +477,10 @@ public class MyGig_Planner implements EntryPoint {
 						ci = ci % 7;
 						
 					}
-					
-					home.add(calender);
+					*/
 				}
 				
 			});
-			
-			// Start adding to gigCalendar tab
-			HorizontalPanel calendarPanel = new HorizontalPanel();
-			gigCalendar.add(calendarPanel);
-			Calendar calendar = new Calendar();
-			gigCalendar.add(calendar);
 			
 			String profileUser = Window.Location.getParameter("user") ==null ? Cookies.getCookie("activeUser") : Window.Location.getParameter("user");
 			
@@ -510,7 +498,7 @@ public class MyGig_Planner implements EntryPoint {
 										&&Window.Location.getParameter("edit")!=null;
 				Button profileButton = null;
 				
-				// If we dont have a user
+				// If we don't have a user
 				if(Window.Location.getParameter("user")==null){
 					
 					// If the edit parameter is set
@@ -519,7 +507,7 @@ public class MyGig_Planner implements EntryPoint {
 						// Add the done editing parameter
 						profilePanel.add(profileButton = new Button("Done Editing!"));
 						
-						// Lisen for when it is clicked
+						// Listen for when it is clicked
 						profileButton.addClickHandler(new ClickHandler(){
 							
 							@Override
@@ -628,8 +616,8 @@ public class MyGig_Planner implements EntryPoint {
 			}
 			
 			
-			
-		}else{
+		}
+		else {
 			
 			HorizontalPanel horizontalPanel = new HorizontalPanel();
 			home.add(horizontalPanel);
