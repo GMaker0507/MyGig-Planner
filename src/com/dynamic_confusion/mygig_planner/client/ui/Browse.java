@@ -1,5 +1,10 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
 import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.dynamic_confusion.mygig_planner.client.ss_service.ServerSideServiceClientImpl;
@@ -11,6 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -19,38 +25,46 @@ public class Browse extends Composite {
 	private ScrollPanel scrollPanel;
 	private FlexTable browseTable;
 	private ServerSideServiceClientImpl ssService;
+	TreeSet<Genre> genre;
 	
-	int minCapacity;
-	int minPay;
-	Boolean requiresPA;
-	Boolean requiresHospPack;
-	Boolean original;
-	Boolean needsSoundPerson;
+	int minCapacity = Integer.MAX_VALUE;
+	int maxPay = Integer.MAX_VALUE;
+	Boolean requiresPA = false;
+	Boolean requiresHospPack = false;
+	Boolean original = false;
+	Boolean needsSoundPerson = false;
 	Boolean availableOnly = false;
+	TextBox txtbxminCapacity;
+	TextBox txtbxmaxPay;
 	
 	public Browse(ServerSideServiceClientImpl service) {
 		
 		ssService = service;
+		genre = new TreeSet<Genre>();
+		
 		
 		// Main display
 		FlexTable form = new FlexTable();
 		initWidget(form);
-		form.setSize("870px", "490px");
+		form.setSize("800px", "512px");
 		
 		// Table displaying browse criteria
 		browseTable = new FlexTable();
 		form.setWidget(0, 0, browseTable);
-		browseTable.setSize("120px", "490px");
+		browseTable.setSize("250px", "490px");
 		
 		// Browse Label
 		Label browseLabel = new Label("Browse");
 		browseLabel.setStyleName("mgp-Label");
 		browseTable.setWidget(0, 0, browseLabel);
 		
+		Label lblBackToSearch = new Label("Back to Search...");
+		browseTable.setWidget(1, 0, lblBackToSearch);
+		
 		// Panel which includes browse options
 		AbsolutePanel absolutePanel = new AbsolutePanel();
-		browseTable.setWidget(1, 0, absolutePanel);
-		absolutePanel.setSize("120px", "450px");
+		browseTable.setWidget(2, 0, absolutePanel);
+		absolutePanel.setSize("120px", "512px");
 		
 		// TODO Add browse options
 		
@@ -62,7 +76,7 @@ public class Browse extends Composite {
 			}
 		});
 		browseButton.setStyleName("mgp-Button");
-		absolutePanel.add(browseButton, 10, 403);
+		absolutePanel.add(browseButton, 10, 474);
 		
 		// Radiio buttons for Availability
 		{
@@ -98,30 +112,128 @@ public class Browse extends Composite {
 			
 			CheckBox chckbxRock = new CheckBox("Rock");
 			absolutePanel.add(chckbxRock, 10, 110);
+			chckbxRock.setSize("72px", "20px");
+			chckbxRock.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.ROCK))
+						genre.remove(Genre.ROCK);
+					else genre.add(Genre.ROCK);
+				}
+			});
 			
 			CheckBox chckbxPop = new CheckBox("Pop");
 			absolutePanel.add(chckbxPop, 10, 130);
+			chckbxPop.setSize("72px", "20px");
+			chckbxPop.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.POP))
+						genre.remove(Genre.POP);
+					else genre.add(Genre.POP);
+				}
+			});
 			
 			CheckBox chckbxCountry = new CheckBox("Country");
 			absolutePanel.add(chckbxCountry, 10, 150);
+			chckbxCountry.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.COUNTRY))
+						genre.remove(Genre.COUNTRY);
+					else genre.add(Genre.COUNTRY);
+				}
+			});
 
 			CheckBox chckbxSka = new CheckBox("Ska");
-			absolutePanel.add(chckbxCountry, 10, 170);
+			absolutePanel.add(chckbxSka, 10, 170);
+			chckbxSka.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.SKA))
+						genre.remove(Genre.SKA);
+					else genre.add(Genre.SKA);
+				}
+			});
 			
 			CheckBox chckbxReggae = new CheckBox("Reggae");
-			absolutePanel.add(chckbxCountry, 10, 190);
+			absolutePanel.add(chckbxReggae, 10, 190);
+			chckbxReggae.setSize("100px", "20px");
+			chckbxReggae.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.REGGAE))
+						genre.remove(Genre.REGGAE);
+					else genre.add(Genre.REGGAE);
+				}
+			});
 
 			CheckBox chckbxBluegrass = new CheckBox("Bluegrass");
-			absolutePanel.add(chckbxCountry, 10, 210);
+			absolutePanel.add(chckbxBluegrass, 10, 210);
+			chckbxBluegrass.setSize("110px", "20px");
+			chckbxBluegrass.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.BLUEGRASS))
+						genre.remove(Genre.BLUEGRASS);
+					else genre.add(Genre.BLUEGRASS);
+				}
+			});
 
 			CheckBox chckbxHiphop = new CheckBox("Hiphop");
-			absolutePanel.add(chckbxCountry, 10, 230);
+			absolutePanel.add(chckbxHiphop, 10, 230);
+			chckbxHiphop.setSize("100px", "20px");
+			chckbxHiphop.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.HIPHOP))
+						genre.remove(Genre.HIPHOP);
+					else genre.add(Genre.ROCK);
+				}
+			});
 
 			CheckBox chckbxIndustrial = new CheckBox("Industrial");
-			absolutePanel.add(chckbxCountry, 10, 250);
+			absolutePanel.add(chckbxIndustrial, 10, 250);
+			chckbxIndustrial.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.INDUSTRIAL))
+						genre.remove(Genre.INDUSTRIAL);
+					else genre.add(Genre.INDUSTRIAL);
+				}
+			});
 
 			CheckBox chckbxRockabilly = new CheckBox("Rockabilly");
-			absolutePanel.add(chckbxCountry, 10, 270);
+			absolutePanel.add(chckbxRockabilly, 10, 270);
+			chckbxRockabilly.setSize("110px", "20px");
+			chckbxRockabilly.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(genre.contains(Genre.ROCKABILLY))
+						genre.remove(Genre.ROCKABILLY);
+					else genre.add(Genre.ROCKABILLY);
+				}
+			});
+		}
+		
+		{
+			Label labelminCapacity = new Label("Minimum Capacity");
+			absolutePanel.add(labelminCapacity, 10, 296);
+			txtbxminCapacity = new TextBox();
+			absolutePanel.add(txtbxminCapacity, 10, 312);
+			txtbxminCapacity.setSize("90px", "12px");
+			
+			Label labelminPay = new Label("Minimum Pay");
+			absolutePanel.add(labelminPay, 10, 336);
+			txtbxmaxPay = new TextBox();
+			absolutePanel.add(txtbxmaxPay, 10, 356);
+			txtbxmaxPay.setSize("90px", "8px");
+		
+			CheckBox chckbxrequiresPA = new CheckBox("Requires PA");
+			absolutePanel.add(chckbxrequiresPA, 10, 388);
+			
+			CheckBox chckbxrequiresHospPack = new CheckBox("Requires Hospitality Package");
+			chckbxrequiresHospPack.setHTML(" Requires Hospitality Package");
+			absolutePanel.add(chckbxrequiresHospPack, 10, 408);
+			chckbxrequiresHospPack.setSize("219px", "18px");
+			
+			CheckBox chckbxoriginal = new CheckBox("Original Band");
+			absolutePanel.add(chckbxoriginal, 10, 428);
+		
+			CheckBox chckbxneedsSoundPerson = new CheckBox("Needs Sound Person");
+			absolutePanel.add(chckbxneedsSoundPerson, 10, 448);
+			chckbxneedsSoundPerson.setSize("190px", "18px");
 		}
 		
 		
@@ -133,10 +245,13 @@ public class Browse extends Composite {
 	}
 	
 	private void getResults() {
-		// BandDatabase database = new BandDatabase();
-		// Band[] bands = database.getBands();
 		
 		SearchInfo searchInfo = new SearchInfo();
+		if( txtbxminCapacity.getValue().equals("") )
+			minCapacity = 0;
+		if( txtbxmaxPay.getValue().equals("") )
+			maxPay = 0;
+
 
 		ssService.search(searchInfo, new AsyncCallback() {
 
@@ -150,12 +265,18 @@ public class Browse extends Composite {
 
 				// Sets result of browse to tables
 				for(int i = 0 ; i < userInfo.length ; i++) {
-					browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
-					browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
+					if( genre.contains(userInfo[i].genre) || genre.isEmpty() ) {
+						if( userInfo[i].capacity >= minCapacity )
+							if( userInfo[i].priceRange <= maxPay )
+								if(requiresPA && userInfo[i].hasPA)
+									if( !(original && !userInfo[i].onlyOriginalMusic) )
+										if( !(needsSoundPerson && !userInfo[i].hasSoundPerson) )
+											browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
+											browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
 					
+					}
 				}
 			}
 		});
-		
 	}
 }
