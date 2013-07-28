@@ -13,43 +13,45 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.datepicker.client.DatePicker;
 
 public class Calendar extends Composite {
-
+	
+	String dateString;
+	VerticalPanel verticalPanel;
+	Label currentDate;
+	
 	public Calendar() {
 		
-		HorizontalPanel horizontalPanel = new HorizontalPanel();
+		final HorizontalPanel horizontalPanel = new HorizontalPanel();
 		initWidget(horizontalPanel);
-		final VerticalPanel verticalPanel = new VerticalPanel();
-		verticalPanel.setVisible(false);
-		
+
 		final DatePicker datePicker = new DatePicker();
 		datePicker.setStyleName("gwt-Label-Login");
 		datePicker.setSize("500px", "500px");
-		
-		final TextBox timebx =new TextBox();
-        timebx.setReadOnly(true);
-        verticalPanel.add(timebx);
-		 
+        
 		datePicker.addValueChangeHandler(new ValueChangeHandler<Date>() {
 
             public void onValueChange(ValueChangeEvent<Date> event) {
                 // TODO Auto-generated method stub
 
                 Date date=event.getValue();
-                timebx.setText(DateTimeFormat.getFormat("yyyy-MM-dd").format(date));
-   
-                if (timebx.getText().matches("2013-07-24")) {
+                dateString = DateTimeFormat.getFormat("yyyy-MM-dd").format(date);
+                // Put the panel in another class to update the panel
+         
+                if (dateString.matches("2013-07-24")) {
                 	
-                	verticalPanel.add(new Label("You are at the correct date!"));
-                	verticalPanel.setVisible(true);
                 	// Info on this tab, include:
                 	// Band that is playing 
-                }	
+                	// Create new CalendarPanel class to represent the activities
+                	CalendarPanel calendarPanel = new CalendarPanel(dateString);
+                	verticalPanel = new VerticalPanel();
+                	currentDate = calendarPanel.CurrentDate();
+                	verticalPanel.add(currentDate);
+                	horizontalPanel.add(verticalPanel);
+                }
                 else
-                	verticalPanel.setVisible(false);
+                	verticalPanel.remove(currentDate);
             }
         });	
-		
+	
 		horizontalPanel.add(datePicker);
-		horizontalPanel.add(verticalPanel);
 	}
 }

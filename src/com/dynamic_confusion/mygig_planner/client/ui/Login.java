@@ -47,7 +47,7 @@ public class Login extends Composite {
 		// Add login layout to get the user's name and password
 		Label userLabel = new Label("Username"), passLabel = new Label("Password");
 		final TextBox userTextBox = new TextBox();
-		final TextBox passwordTextBox = new TextBox();
+		final PasswordTextBox passwordTextBox = new PasswordTextBox();
 		
 		// Set names for the form
 		userTextBox.setName("username");
@@ -81,7 +81,7 @@ public class Login extends Composite {
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				// TODO Auto-generated method stub
 				
-				loginButton.setText("Login");
+				loginButton.setText("Wait...");
 				loginButton.setEnabled(true);
 				
 				String loginResults = event.getResults().trim();
@@ -95,14 +95,14 @@ public class Login extends Composite {
 					// Reload
 					Window.Location.reload();
 					
-				}else{
-
-					String errorMessage = loginResults;
+				}
+				else {
 					
 					// TODO handle output of error message
-					RootPanel.get().add(new HTML(errorMessage));
+					//RootPanel.get().add(new HTML(errorMessage));
+					Window.alert(loginResults);
+					loginButton.setText("Log in");	
 				}
-				
 			}
 		});
 
