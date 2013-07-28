@@ -57,7 +57,7 @@ public class LoginServlet extends HttpServlet {
 			// Try to get the entity
 			Entity userEntity = pqGetUser.asSingleEntity();
 			
-			if(userEntity==null){			
+			if(userEntity!=null){			
 				
 				out.print("success");
 				

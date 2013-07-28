@@ -8,8 +8,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -19,17 +19,16 @@ public class Register extends Composite {
 
 	public Register() {
 		
-		final TextBox userTextBox = new TextBox(), passTextBox = new TextBox(), fnameTextBox = new TextBox(), lnameTextBox = new TextBox();
-		final TextBox addressTextBox = new TextBox(), phonenumberTextBox = new TextBox(), openhoursTextBox = new TextBox(), genreTextBox = new TextBox();
-		final TextBox capacityTextBox = new TextBox(), pricerangeTextBox = new TextBox(), verpassTextBox = new TextBox();
-		
+		final TextBox userTextBox = new TextBox(), fnameTextBox = new TextBox(), lnameTextBox = new TextBox();
+		final TextBox addressTextBox = new TextBox(), phonenumberTextBox = new TextBox(), genreTextBox = new TextBox();
+		final TextBox capacityTextBox = new TextBox(), pricerangeTextBox = new TextBox(), openhoursTextBox = new TextBox();
+		final PasswordTextBox passTextBox = new PasswordTextBox(), verpassTextBox = new PasswordTextBox();
 		// Set names for the form
 		userTextBox.setName("username");		passTextBox.setName("password");			verpassTextBox.setName("verifypassword");
 		fnameTextBox.setName("firstName");		lnameTextBox.setName("lastName");
 		addressTextBox.setName("address");		phonenumberTextBox.setName("phoneNumber");
 		openhoursTextBox.setName("openHours");	genreTextBox.setName("genre");
 		capacityTextBox.setName("capacity");	pricerangeTextBox.setName("priceRange");
-		
 		
 		// Create a form panel
 		final FormPanel registerForm = new FormPanel();
@@ -55,9 +54,9 @@ public class Register extends Composite {
 		FlexTable flexTable = new FlexTable();
 		verticalPanel.add(flexTable);
 		
-		Label userLabel = new Label("Username"), passLabel = new Label("Password"), firstname = new Label("First Name"), lastname = new Label("Last Name");
+		Label userLabel = new Label("*Username"), passLabel = new Label("*Password"), firstname = new Label("First Name"), lastname = new Label("Last Name");
 		Label address = new Label("Address"), phonenumber = new Label("Phone Number"), openhours = new Label("Business Hours"), genre = new Label("Genre");
-		Label capacity = new Label("Capacity"), pricerange = new Label("Price Range"), verpass = new Label("Enter password again");
+		Label capacity = new Label("Capacity"), pricerange = new Label("Price Range"), verpass = new Label("*Enter password again");
 		
 		// Labels										Text Boxes 
 		flexTable.setWidget(1, 0, userLabel);			flexTable.setWidget(1, 1, userTextBox);
@@ -81,9 +80,26 @@ public class Register extends Composite {
 					
 			@Override
 			public void onClick(ClickEvent event) {
-						
-				// Submit the form
-				registerForm.submit();	
+				
+				// If the username and password and verpassword text boxes are empty, ask user to fill it
+				if (userTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || verpassTextBox.getText().isEmpty()) {
+					
+					Window.alert("Please fill the mandatory asterisk fields.");
+				}
+				
+				// If the password and verpassword fields don't match, alert the user
+				else if (!passTextBox.getText().matches(verpassTextBox.getText())) {
+					
+					Window.alert("Password and Verify Password does not match, please type in right or get!!");
+				}
+				
+				else {
+					
+					Window.alert("Registration successful!");
+					// Submit the form
+					registerForm.submit();	
+					Window.Location.reload();
+				}	
 			}
 		});
 				
@@ -96,19 +112,22 @@ public class Register extends Composite {
 				String registerResults = event.getResults().trim();
 				
 				// If it says success
-				if(registerResults.equals("success")){
+				if (registerResults.indexOf("success") != -1) {
 					
-					// Setthe cookie
+					Window.alert("Successfull registration!");
+					
+					// Set the cookie
 					Cookies.setCookie("activeUser", userTextBox.getText());	
 					
 					// Reload
 					Window.Location.reload();
 
-				}else{
-
+				}
+				else {
 
 					String errorMessage = registerResults;
 					
+					Window.alert(errorMessage);
 					// TODO handle output of error message
 					
 					//home.add(new HTML(errorMessage));

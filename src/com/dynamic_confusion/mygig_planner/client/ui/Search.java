@@ -8,9 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -62,9 +60,8 @@ public class Search extends Composite {
 		Label advancedSearchText = new Label("Advanced Search... ");
 		advancedSearchText.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent event) {
-				Browse browse = new Browse(ssService);
 				form.clear();
-				form.add(browse);
+				form.add(new Browse(ssService));
 			}
 		});
 		searchFlexTable.setWidget(1, 1, advancedSearchText);
@@ -113,6 +110,8 @@ public class Search extends Composite {
 						}
 					}
 				}
+				if(numRow == 0)
+					searchTable.setWidget(0, 0, new Label("No Results Found."));
 			}
 		});
 	}

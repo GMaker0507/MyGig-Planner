@@ -26,5 +26,13 @@ public class GigInfo implements Serializable{
 		// TODO Auto-generated method stub
 		return sendUser+recipientUser+name+dateSent.toString();
 	}
-	
+
+	public String toString(){
+		
+		return "Gig offer by "+sendUser+
+				" to "+recipientUser+", on "+dateSent+
+				(status==0 ? ". No reply yet!" :
+				(status==1 ? "Accepted on "+dateReplied.toString() :
+				"Rejected on "+dateReplied.toString()));
+	}
 }

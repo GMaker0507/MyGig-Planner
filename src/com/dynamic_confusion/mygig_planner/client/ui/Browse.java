@@ -22,10 +22,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.CheckBox;
 
 public class Browse extends Composite {
+	FlexTable form;
 	private ScrollPanel scrollPanel;
 	private FlexTable browseTable;
 	private ServerSideServiceClientImpl ssService;
-	TreeSet<Genre> genre;
+	TreeSet<String> genre;
 	
 	int minCapacity = Integer.MAX_VALUE;
 	int maxPay = Integer.MAX_VALUE;
@@ -40,11 +41,11 @@ public class Browse extends Composite {
 	public Browse(ServerSideServiceClientImpl service) {
 		
 		ssService = service;
-		genre = new TreeSet<Genre>();
+		genre = new TreeSet<String>();
 		
 		
 		// Main display
-		FlexTable form = new FlexTable();
+		form = new FlexTable();
 		initWidget(form);
 		form.setSize("800px", "512px");
 		
@@ -59,6 +60,12 @@ public class Browse extends Composite {
 		browseTable.setWidget(0, 0, browseLabel);
 		
 		Label lblBackToSearch = new Label("Back to Search...");
+		lblBackToSearch.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				form.clear();
+				form.add(new Search(ssService));
+			}
+		});
 		browseTable.setWidget(1, 0, lblBackToSearch);
 		
 		// Panel which includes browse options
@@ -66,7 +73,7 @@ public class Browse extends Composite {
 		browseTable.setWidget(2, 0, absolutePanel);
 		absolutePanel.setSize("120px", "512px");
 		
-		// TODO Add browse options
+		
 		
 		// Browse button
 		Button browseButton = new Button("Browse");
@@ -102,7 +109,7 @@ public class Browse extends Composite {
 			});
 			radioBtnAvail.setText("Available Only");
 			absolutePanel.add(radioBtnAvail, 10, 51);
-			radioBtnAvail.setSize("110px", "20px");
+			radioBtnAvail.setSize("215px", "25");
 		}
 		
 		// Check boxes for Genre
@@ -136,9 +143,9 @@ public class Browse extends Composite {
 			absolutePanel.add(chckbxCountry, 10, 150);
 			chckbxCountry.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					if(genre.contains(Genre.COUNTRY))
-						genre.remove(Genre.COUNTRY);
-					else genre.add(Genre.COUNTRY);
+					if(genre.contains(Genre.COUNTR))
+						genre.remove(Genre.COUNTR);
+					else genre.add(Genre.COUNTR);
 				}
 			});
 
@@ -179,14 +186,15 @@ public class Browse extends Composite {
 			chckbxHiphop.setSize("100px", "20px");
 			chckbxHiphop.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					if(genre.contains(Genre.HIPHOP))
-						genre.remove(Genre.HIPHOP);
+					if(genre.contains(Genre.HIPHOOP))
+						genre.remove(Genre.HIPHOOP);
 					else genre.add(Genre.ROCK);
 				}
 			});
 
 			CheckBox chckbxIndustrial = new CheckBox("Industrial");
 			absolutePanel.add(chckbxIndustrial, 10, 250);
+			chckbxIndustrial.setSize("100px", "20px");
 			chckbxIndustrial.addClickHandler(new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					if(genre.contains(Genre.INDUSTRIAL))
@@ -208,32 +216,67 @@ public class Browse extends Composite {
 		}
 		
 		{
+			// Text box and Label for the minimum capacity of venue
 			Label labelminCapacity = new Label("Minimum Capacity");
 			absolutePanel.add(labelminCapacity, 10, 296);
 			txtbxminCapacity = new TextBox();
 			absolutePanel.add(txtbxminCapacity, 10, 312);
 			txtbxminCapacity.setSize("90px", "12px");
 			
+			// Text box and label for the minimum pay of the venue
 			Label labelminPay = new Label("Minimum Pay");
 			absolutePanel.add(labelminPay, 10, 336);
 			txtbxmaxPay = new TextBox();
 			absolutePanel.add(txtbxmaxPay, 10, 356);
 			txtbxmaxPay.setSize("90px", "8px");
 		
+			// Check box for if the band requires a PA
 			CheckBox chckbxrequiresPA = new CheckBox("Requires PA");
+			chckbxrequiresPA.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(requiresPA == false)
+						requiresPA = true;
+					else requiresPA = true;
+				}
+			});
 			absolutePanel.add(chckbxrequiresPA, 10, 388);
 			
-			CheckBox chckbxrequiresHospPack = new CheckBox("Requires Hospitality Package");
-			chckbxrequiresHospPack.setHTML(" Requires Hospitality Package");
+			// Check box if the band requires a hospitility package
+			CheckBox chckbxrequiresHospPack = new CheckBox("Hospitality Package");
+			chckbxrequiresHospPack.setHTML("Hospitality Package");
+			chckbxrequiresHospPack.setSize("231px", "18px");
+			chckbxrequiresHospPack.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(requiresHospPack == false)
+						requiresHospPack = true;
+					else requiresHospPack = true;
+				}
+			});
 			absolutePanel.add(chckbxrequiresHospPack, 10, 408);
-			chckbxrequiresHospPack.setSize("219px", "18px");
 			
+			// Check box for if the band plays original music
 			CheckBox chckbxoriginal = new CheckBox("Original Band");
+			chckbxoriginal.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(original == false)
+						original = true;
+					else original = true;
+				}
+			});
 			absolutePanel.add(chckbxoriginal, 10, 428);
 		
-			CheckBox chckbxneedsSoundPerson = new CheckBox("Needs Sound Person");
-			absolutePanel.add(chckbxneedsSoundPerson, 10, 448);
+			// Check box for if the band needs a sound person
+			CheckBox chckbxneedsSoundPerson = new CheckBox("Sound Person");
 			chckbxneedsSoundPerson.setSize("190px", "18px");
+			chckbxneedsSoundPerson.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if(requiresHospPack == false)
+						requiresHospPack = true;
+					else requiresHospPack = true;
+				}
+			});
+			absolutePanel.add(chckbxneedsSoundPerson, 10, 448);
+			
 		}
 		
 		

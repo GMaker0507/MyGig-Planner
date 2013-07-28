@@ -49,6 +49,18 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/changeAvailability</url-pattern>
 	</servlet-mapping>
 	
+	<!--  A http servlet for admin actions. -->
+	
+	<servlet>
+		<servlet-name>adminServlet</servlet-name>
+		<servlet-class>com.dynamic_confusion.mygig_planner.server.users.AdminServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>adminServlet</servlet-name>
+		<url-pattern>admin/*</url-pattern>
+	</servlet-mapping>	
+	
 	<!--  Http Servlet for accepting or declining gigs -->
 	
 	

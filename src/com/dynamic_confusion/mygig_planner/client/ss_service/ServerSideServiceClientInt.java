@@ -9,9 +9,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface ServerSideServiceClientInt {
 
 	
-	void sendOffer(GigInfo gig, AsyncCallback callback);
-	void rejectOffer(GigInfo gig, AsyncCallback callback);
-	void acceptOffer(GigInfo gig, AsyncCallback callback);
 	void getOffers(Date startRange, Date endRange, AsyncCallback callback);
 	void getOffers(AsyncCallback callback);
 
@@ -26,4 +23,8 @@ public interface ServerSideServiceClientInt {
 
 	void getDatesAvailable(String username, Date start, Date end, AsyncCallback callback);
 	void getErrorMessage(AsyncCallback asyncCallback);
+	void getTopUsers(int i, AsyncCallback asyncCallback);
+	void getTopMusicians(int i, AsyncCallback asyncCallback);
+	void getTopVenues(int i, AsyncCallback asyncCallback);
+	void getNewestUsers(int i, AsyncCallback asyncCallback);
 }

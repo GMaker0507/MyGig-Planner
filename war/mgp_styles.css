@@ -1,0 +1,286 @@
+.none{
+color: #0c021c;
+color: #1c0640;
+color: #5221a3;
+color: #c5b1e7;
+}
+body, html{
+    width:100%;
+    height:100;
+    margin:0px;
+    padding:0px;
+    color:#c5b1e7;
+    background-color:#000000;
+    font-family:calibri, tahoma, sans-serif;
+}
+
+#header{
+    
+    width:100%;
+    padding-top:7px;
+    padding-bottom:39px;
+    text-align: center;
+}
+#headerContent{
+    
+    margin:auto;
+    width:800px;
+    height:90px;
+    position:relative;
+}
+#header #textSection{
+    width:320px;
+    height:90px;
+    padding-left:5px;
+    padding-right:5px;
+    position: absolute;
+    right: 187px;
+    top:0px;
+}
+#header img#logoImage{
+    width:213px;
+    height:104px;
+    padding: 0px;
+    margin:0px;
+    position: absolute;
+    left:0px;
+    top:0px;
+}
+#header img#newsImage{
+    width:183px;
+    height:104px;
+    padding: 0px;
+    margin:0px;
+    position: absolute;
+    right:0px;
+    top:0px;
+}
+#newsHeader{
+    color:#5221a3;
+    font-size:24px;
+    position: absolute;
+    left:4px;
+    top:2px;
+    margin:0px;
+    padding:0px;
+    font-family: Impact, Charcoal, sans-serif;
+}
+#newsDate{
+    
+    color:#c5b1e7;
+    font-size:15px;
+    position: absolute;
+    right:4px;
+    top:8px;
+    margin:0px;
+    padding:0px;
+    font-family: Impact, Charcoal, sans-serif;
+}
+#newsText{
+    color:#c5b1e7;
+    font-size:12px;
+    position: absolute;
+    left:0px;
+    top:28px;
+    text-align: right;
+    margin:0px;
+    overflow: hidden;
+    height:51px;
+    padding:4px;
+}
+#content{
+    
+    width:100%;
+    background-color:#5221a3;
+}
+
+#mgpContent{
+    
+    margin: auto;
+    position: relative;
+    width:800px;
+    min-height:522px;
+    top:-29px;
+    left:0px;
+}
+
+#popularGenres{
+    
+    width:100%;
+    min-height:142px;
+    text-align:center;
+    background-color:#1c0640;
+}
+
+.popularGenre{
+    
+    width:195px;
+    height:136px;
+    
+    margin-left:2px;
+    margin-right:2px;
+    margin-top:8px;
+    
+    background-size:100% 100%;
+    background-repeat:no-repeat;
+    
+    display:inline-block;
+}
+
+#heavyMetal{ background-image:url('images/PopularGenres_HeavyMetalPNG.png'); }
+#rockAndRoll{ background-image:url('images/PopularGenres_RockAndRollPNG.png'); }
+#hipHop{ background-image:url('images/PopularGenres_HipHopPNG.png'); }
+#countryMusic{ background-image:url('images/PopularGenres_CountryMusicPNG.png'); }
+#alternativeMusic{ background-image:url('images/PopularGenres_AlternativeMusicPNG.png'); }
+
+#usersLists{
+    
+    width:100%;
+    padding-top:5px;
+    padding-bottom:5px;
+    text-align: center;
+    background-color:#0c021c
+}
+
+#usersListsContent{
+    
+    width:800px;
+    margin:auto;
+}
+
+#usersLists table{
+    width:100%;
+    margin:0px;
+    padding:0px;
+}
+
+
+.userHeader{
+    
+    color:#5221a3;
+    font-size:18px;
+    font-family:calibri, tahoma, sans-serif;
+}
+
+ul{
+    margin:0px;
+    padding:0px;
+    
+    list-style: none;
+}
+
+ul li{    
+    color:#5221a3;
+    font-size:14px;
+    font-family:calibri, tahoma, sans-serif;
+}
+
+ul.odd li{
+    
+    
+    color:#af98d6;
+    font-size:14px;
+    font-family:calibri, tahoma, sans-serif;
+}
+#teamMembers{
+    
+    padding-top:10px;
+    margin-bottom:10px;
+    width:100%;
+    text-align: center;
+    background-color:#000000;
+}
+
+#marcusHobbs,#mikeSmith,#allenLin,#ericaTerry,#larryJennings{
+    
+    width:158px;
+    height:124px;
+    
+    border-radius: 20px;
+    -moz-border-radius: 20px;
+    
+    margin-left:4px;
+    margin-right:4px;
+    margin-top:4px;
+    
+    background-color:#5221a3;
+    
+    display:inline-block;
+}
+
+.teamMember .tmName{
+    
+    margin:0px;
+    margin-top:5px;
+    padding:0px;
+    font-size:24px;
+    color:#0c021c;
+    text-transform: uppercase;
+    font-family: Impact, Charcoal, sans-serif;
+}
+
+
+.teamMember .tmRoles{
+    
+    color:#1c0640;
+    
+    margin:0px;
+    padding:0px;
+    font-family: Impact, Charcoal, sans-serif;
+}
+
+.teamMember .tmDescription{
+    
+    color:#c5b1e7;
+    
+    margin:0px;
+    padding:0px;
+    font-size:11px;
+}
+
+/*
+#marcusHobbs{background-image:url('images/MarcusHobbsPNG.png');}
+#mikeSmith{background-image:url('images/MikeSmithPNG.png');}
+#allenLin{background-image:url('images/AllenLinPNG.png');}
+#ericaTerry{background-image:url('images/EricaTerryPNG.png');}
+#larryJennings{background-image:url('images/LarryJenningsPNG.png');}
+*/
+#copyright{
+    
+    width:100%;
+    height:200px;
+    text-align: center;
+    background-color:#000000;
+}
+
+#copyrightHeader{
+    margin:0px;
+    color:#764dbb;
+    font-size:24px;
+    font-family:Impact, Charcoal, sans-serif;
+}
+
+#copyrightTeam{
+    margin:0px;
+    color:#4a1e93;
+    font-size:18px;
+    font-family:Impact, Charcoal, sans-serif;
+    
+}
+
+a{
+    color:#c5b1e7;
+}
+
+a:visited{
+    color:#c5b1e7;
+}
+
+input[type=text], textarea,input[type=password] {
+  padding: 5px 4px;
+  background: #c5b1e7;
+  border-radius: 4px;
+  border:none;
+  color:#000;
+  font-size: small;
+}
