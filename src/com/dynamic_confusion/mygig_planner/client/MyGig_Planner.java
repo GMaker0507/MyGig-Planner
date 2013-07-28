@@ -63,13 +63,6 @@ public class MyGig_Planner implements EntryPoint {
 		// Set the width
 		tp.setWidth("800px");
 		
-		Grid filesGrid = new Grid(6, 1);
-		
-		filesGrid.setHTML(0, 0, "Project Management Plan");
-		filesGrid.setHTML(1, 0, "Software Requirements Specification");
-		filesGrid.setHTML(2, 0, "High Level Design");
-		filesGrid.setHTML(3, 0, "Low Level Design");
-		
 		final AbsolutePanel home = new AbsolutePanel();
 		final AbsolutePanel profilePanel = new AbsolutePanel();
 		final AbsolutePanel search = new AbsolutePanel();
@@ -119,7 +112,6 @@ public class MyGig_Planner implements EntryPoint {
 		}
 		
 		tp.add(new HTML("tab 3"),"Help");
-		tp.add(filesGrid,"Project Files & Information");
 		
 		final TextBox tbLoginUsername = new TextBox();
 		final TextBox tbLoginPassword = new TextBox();
@@ -146,7 +138,8 @@ public class MyGig_Planner implements EntryPoint {
 					// Reload
 					Window.Location.reload();
 
-				}else{
+				}
+				else {
 
 
 					String errorMessage = registerResults;
@@ -163,14 +156,12 @@ public class MyGig_Planner implements EntryPoint {
 		
 		final TextBox searchBox = new TextBox();
 		final DatePicker datePicker = new DatePicker();		
-		final List<Date> availableDates = new ArrayList<Date>();
 		
 		searchButton.addClickHandler(new ClickHandler(){
 			
 			@Override
 			public void onClick(ClickEvent event) {
 
-				
 				searchButton.setText("Searching...");
 				searchButton.setEnabled(false);
 				
@@ -214,7 +205,6 @@ public class MyGig_Planner implements EntryPoint {
 		search.add(addDateButton);
 		search.add(searchBox);
 		search.add(searchButton);
-				
 		
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
@@ -322,8 +312,6 @@ public class MyGig_Planner implements EntryPoint {
 					
 						// TODO Auto-generated method stub
 						GigInfo[] gigs = (GigInfo[])result;
-						
-						Grid gigGrid = new Grid(gigs.length,1);
 
 						// Add the header
 						logbook.add(new HTML("<h3>Gig Offers</h3>"));
@@ -373,111 +361,6 @@ public class MyGig_Planner implements EntryPoint {
 							}
 						}
 					}
-				}
-				
-			});
-			
-			Date monthStart, monthEnd;
-			Date today = new Date();
-			
-			final int month = today.getMonth();
-			final int year = today.getYear();
-			
-			monthStart = new Date(year,month,1);
-			monthEnd = new Date(year, month, 31);
-			
-			this.ssService.getDatesAvailable(Cookies.getCookie("activeUser"),monthStart,monthEnd,new AsyncCallback(){
-
-				@Override
-				public void onFailure(Throwable caught) {
-					// TODO Auto-generated method stub
-					home.add(new HTML("Error trying to get availability."));
-				}
-
-				@Override
-				public void onSuccess(Object result) {
-					// TODO Auto-generated method stub
-					/*
-					Date[] dates = (Date[])result;
-					
-					Grid calender = new Grid(5,7);
-					
-					int ci = 0;
-					int ri = 0;
-
-					for(int i=0;i<31;i++){
-						
-						final int date = i+1;
-						Date di = new Date(year,month,date);
-						
-						boolean isAvailable = false;
-						
-						for(int j=0;j<dates.length;j++){
-							
-							if(di.equals(dates[j])==false)continue;
-							
-							isAvailable = true;
-							break;
-						}
-
-						Anchor caAnchor = null;
-						
-						if(isAvailable)caAnchor = new Anchor("[Available] - "+di.toString());				
-						else caAnchor = new Anchor("[Not Available] - "+di.toString());
-						
-						caAnchor.addClickHandler(new ClickHandler(){
-							
-							public void onClick(ClickEvent event) {
-								
-								RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,"/changeAvailability?"
-										+ "user="+Cookies.getCookie("activeUser")+"&"
-										+ "year="+year+"&"
-										+ "month="+month+"&"
-										+ "date="+date);
-								
-								try {
-									rb.sendRequest(null,new RequestCallback(){
-										
-										@Override
-										public void onError(Request request,
-												Throwable exception) {
-											// TODO Auto-generated method stub
-											home.add(new HTML(exception.getMessage()));
-											
-										}
-										
-										@Override
-										public void onResponseReceived(
-												Request request, Response response) {
-											// TODO Auto-generated method stub
-											
-											String rText = response.getText();
-											
-											if(rText.equals("success")){
-												
-												Window.Location.reload();
-											}else{
-												
-												home.add(new HTML(rText));
-											}
-										}
-									});
-								} catch (RequestException e) {
-									// TODO Auto-generated method stub
-									home.add(new HTML(e.getMessage()));
-								}
-								
-							};
-						});
-						
-						calender.setWidget(ri,ci, caAnchor);
-							
-						ci = ci+1;
-						if(ci==7)ri++;
-						ci = ci % 7;
-						
-					}
-					*/
 				}
 				
 			});
@@ -609,13 +492,8 @@ public class MyGig_Planner implements EntryPoint {
 						
 						}
 					}
-					
-					
-				});
-				
-			}
-			
-			
+				});	
+			}	
 		}
 		else {
 			
