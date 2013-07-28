@@ -108,7 +108,7 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			CompositeFilter userDateFilter = new CompositeFilter(CompositeFilterOperator.AND,userDateCollection);
 			
 			// Get gigs meeting this query
-			Query getGigs = new Query("Gig").setFilter(dateFilter);
+			Query getGigs = new Query("Gig").setFilter(userDateFilter);
 			
 			PreparedQuery pqGetGigs = datastore.prepare(getGigs);
 			
@@ -158,7 +158,26 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		List<Filter> ands = new ArrayList<Filter>();
 		
 		// Add requirements if they were set
-		if(info.genre!=null)ands.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre));
+		if(info.genre!=null){
+			
+			// If we only have one			
+			if(info.genre.length==1)ands.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre[0]));
+			
+			// If we have more than one
+			else if(info.genre.length>1){
+				
+				List<Filter> genresFilters = new ArrayList<Filter>();
+				
+				// For each genre
+				for(int i=0;i<info.genre.length;i++){
+					
+					genresFilters.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre[i]));
+				}
+				
+				// Add one of the genres
+				ands.add(new CompositeFilter(CompositeFilterOperator.OR,genresFilters));
+			}
+		}
 		if(info.hasPA)ands.add(new FilterPredicate("hasPA",FilterOperator.EQUAL,true));
 		if(info.hasSoundPerson)ands.add(new FilterPredicate("hasSoundPerson",FilterOperator.EQUAL,true));
 		if(info.onlyOriginalMusic)ands.add(new FilterPredicate("onlyOriginalMusic",FilterOperator.EQUAL,true));
