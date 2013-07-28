@@ -81,6 +81,7 @@ public class Search extends Composite {
 	}
 	
 	private void getResults() {
+		searchTable.clear();
 		final String[] searchWords = searchTextBox.getText().split(" ");
 
 		SearchInfo searchInfo = new SearchInfo();

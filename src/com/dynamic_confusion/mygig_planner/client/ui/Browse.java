@@ -1,8 +1,5 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.TreeSet;
 
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
@@ -20,6 +17,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 
 public class Browse extends Composite {
 	FlexTable form;
@@ -287,9 +285,18 @@ public class Browse extends Composite {
 		form.setWidget(0, 1, scrollPanel);
 		scrollPanel.setSize("750px", "490px");
 		
+		AbsolutePanel resultsPanel = new AbsolutePanel();
+		scrollPanel.setWidget(resultsPanel);
+		Label label = new Label("testuser");
+		label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		label.setStyleName("userHeader");
+		resultsPanel.add(label, 10, 50);
+		resultsPanel.add(new Label("testemail"), 200, 50);
+		
 	}
 	
 	private void getResults() {
+		form.clear();
 		
 		SearchInfo searchInfo = new SearchInfo();
 		if( txtbxminCapacity.getValue().equals("") )
@@ -307,12 +314,16 @@ public class Browse extends Composite {
 			public void onSuccess(Object result) {
 				UserInfo[] userInfo = (UserInfo[]) result;
 				
-
+				AbsolutePanel resultsPanel = new AbsolutePanel();
+				scrollPanel.setWidget(resultsPanel);
+	
 				// Sets result of browse to tables
 				for(int i = 0 ; i < userInfo.length ; i++) {
-						browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
-						browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
+					Label username = new Label(userInfo[i].username);
+					Label email = new Label(userInfo[i].email);
 					
+					resultsPanel.add(username, 10, 50*(i+5));
+					resultsPanel.add(email, 50, 50*(i+5));
 					
 				}
 			}
