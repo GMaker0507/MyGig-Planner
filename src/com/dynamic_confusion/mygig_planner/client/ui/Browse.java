@@ -90,7 +90,7 @@ public class Browse extends Composite {
 			Label lblAvailable = new Label("Available");
 			absolutePanel.add(lblAvailable, 0, 3);
 			
-			RadioButton radioBtnAll = new RadioButton("all_bands");
+			RadioButton radioBtnAll = new RadioButton("available");
 			radioBtnAll.addClickHandler(new ClickHandler(){
 				public void onClick(ClickEvent event) {
 					availableOnly = false;
@@ -98,10 +98,12 @@ public class Browse extends Composite {
 			});
 			
 			radioBtnAll.setText("All Bands");
+			radioBtnAll.setFormValue("available");
 			absolutePanel.add(radioBtnAll, 10, 25);
 			radioBtnAll.setSize("110px", "20px");
 			
 			RadioButton radioBtnAvail = new RadioButton("available");
+			radioBtnAvail.setFormValue("available");
 			radioBtnAll.addClickHandler(new ClickHandler(){
 				public void onClick(ClickEvent event) {
 					availableOnly = true;
@@ -294,8 +296,7 @@ public class Browse extends Composite {
 			minCapacity = 0;
 		if( txtbxmaxPay.getValue().equals("") )
 			maxPay = 0;
-
-
+		
 		ssService.search(searchInfo, new AsyncCallback() {
 
 			public void onFailure(Throwable caught) {
@@ -305,19 +306,14 @@ public class Browse extends Composite {
 
 			public void onSuccess(Object result) {
 				UserInfo[] userInfo = (UserInfo[]) result;
+				
 
 				// Sets result of browse to tables
 				for(int i = 0 ; i < userInfo.length ; i++) {
-					if( genre.contains(userInfo[i].genre) || genre.isEmpty() ) {
-						if( userInfo[i].capacity >= minCapacity )
-							if( userInfo[i].priceRange <= maxPay )
-								if(requiresPA && userInfo[i].hasPA)
-									if( !(original && !userInfo[i].onlyOriginalMusic) )
-										if( !(needsSoundPerson && !userInfo[i].hasSoundPerson) )
-											browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
-											browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
+						browseTable.setWidget(2*i, 2, new Label(userInfo[i].username));
+						browseTable.setWidget(2*i+1, 2, new Label(userInfo[i].email));
 					
-					}
+					
 				}
 			}
 		});
