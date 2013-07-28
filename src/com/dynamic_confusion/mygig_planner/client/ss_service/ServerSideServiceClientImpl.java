@@ -80,66 +80,6 @@ public class ServerSideServiceClientImpl implements ServerSideServiceClientInt {
 	}
 
 	@Override
-	public void sendOffer(GigInfo gig, AsyncCallback callback) {
-		
-		// Get the current user
-		String currentUser = Cookies.getCookie("activeUser");
-
-		// If we dont have an active user logged in
-		if(Cookies.getCookie("activeUser")==null){
-			
-			// Call the on failure method
-			callback.onFailure(new Throwable("No active user found"));
-			return;
-		}
-		
-	
-		// Tell the service to execute it
-		this.service.sendOffer(gig, callback);
-	}
-
-	@Override
-	public void acceptOffer(GigInfo gig, AsyncCallback callback) {
-		
-		// Get the current user
-		String currentUser = Cookies.getCookie("activeUser");
- 
-
-		// If we dont have an active user logged in
-		if(Cookies.getCookie("activeUser")==null){
-			
-			// Call the on failure method
-			callback.onFailure(new Throwable("No active user found"));
-			return;
-		}
-		
-		// Tell the service to execute it
-		this.service.acceptOffer(gig, callback);
-		
-	}
-
-	@Override
-	public void rejectOffer(GigInfo gig, AsyncCallback callback) {
-		
-		// Get the current user
-		String currentUser = Cookies.getCookie("activeUser");
- 
-
-		// If we dont have an active user logged in
-		if(Cookies.getCookie("activeUser")==null){
-			
-			// Call the on failure method
-			callback.onFailure(new Throwable("No active user found"));
-			return;
-		}
-		
-		
-		// Tell the service to execute it
-		this.service.rejectOffer(gig, callback);
-		
-	}
-
-	@Override
 	public void getOffers(Date startRange, Date endRange, AsyncCallback callback) {
 		
 		// Get the current user
@@ -188,5 +128,34 @@ public class ServerSideServiceClientImpl implements ServerSideServiceClientInt {
 			System.out.println("Login success!");
 		}
 	
+	}
+
+	@Override
+	public void getTopVenues(int count, AsyncCallback callback) {
+		
+		// TODO Auto-generated method stub
+		this.service.getTopVenues(count, callback);
+	}
+
+
+	@Override
+	public void getTopMusicians(int count, AsyncCallback callback) {
+		// TODO Auto-generated method stub
+		
+		this.service.getTopMusicians(count, callback);
+	}
+
+	@Override
+	public void getTopUsers(int count, AsyncCallback callback){
+		
+		this.service.getTopUsers(count, callback);
+	}
+
+
+	@Override
+	public void getNewestUsers(int count, AsyncCallback callback) {
+		// TODO Auto-generated method stub
+		
+		this.service.getNewestUsers(count, callback);
 	}
 }

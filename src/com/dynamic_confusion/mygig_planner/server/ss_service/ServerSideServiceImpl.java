@@ -13,6 +13,7 @@ import com.dynamic_confusion.mygig_planner.client.ui.Genre;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -22,6 +23,7 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -34,95 +36,19 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		return errorMessage;
 	}
 	
-	@Override
-	public String sendOffer(GigInfo gig) {
-		
-		try{
-			
-			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-			
-			Entity gigOffer = new Entity("Gig",gig.getEntityName());
-			
-			int zero = 0;
-			
-			// Set the gig information
-			gigOffer.setProperty("name",gig.name);
-			gigOffer.setProperty("entityName",gig.getEntityName());
-			gigOffer.setProperty("sendUser",gig.sendUser);
-			gigOffer.setProperty("recipientUser", gig.recipientUser);
-			gigOffer.setProperty("status",zero);
-			
-			// Put it in the datastore
-			datastore.put(gigOffer);
-
-			
-			
-		}catch(Exception e){
-			
-			return e.toString();
-		}
-		
-		// Return true by default
-		return "success";
-	}
 	
+	/**
+	 * Get offers on the given date
+	 */
 	@Override
-	public String acceptOffer(GigInfo gig){
+	public GigInfo[] getOffers(String user, Date date){
 		
-		try{
-			
-			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-			Query q = new Query("Gig").setFilter(new FilterPredicate("entityName",FilterOperator.EQUAL,gig.getEntityName()));
-			
-			// GEt this gig
-			Entity gigEntity = datastore.prepare(q).asSingleEntity();
-
-			// Set the status as 1 for accepted
-			gigEntity.setProperty("status", 1);
-			
-			// Put the entity back in to update
-			datastore.put(gigEntity);
-			
-			
-		}catch(Exception e){
-			
-			return e.toString();
-		}
-		
-		// Return true by default
-		return "success";
-		
+		return getOffers(user,date,date);
 	}
 
-	@Override
-	public String rejectOffer(GigInfo gig) {
-		
-		try{
-			
-			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-			Query q = new Query("Gig").setFilter(new FilterPredicate("entityName",FilterOperator.EQUAL,gig.getEntityName()));
-			
-			// GEt this gig
-			Entity gigEntity = datastore.prepare(q).asSingleEntity();
-
-			// Set the status as -1 for rejected
-			gigEntity.setProperty("status", -1);
-			
-			// Put the entity back in to update
-			datastore.put(gigEntity);
-			
-			
-		}catch(Exception e){
-			
-			return e.toString();
-		}
-		
-		// Return true by default
-		return "success";
-	}
-
+	/**
+	 * Get offers in the given range
+	 */
 	@Override
 	public GigInfo[] getOffers(String user, Date startRange, Date endRange) {
 		
@@ -131,18 +57,58 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		try{
 			
+			// Get the datastore
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-			
+			// Match recipients or senders
 			FilterPredicate recipient = new FilterPredicate("recipientUser",FilterOperator.EQUAL,user);
 			FilterPredicate send = new FilterPredicate("sendUser",FilterOperator.EQUAL,user);
 			
-			Collection<Filter> predicates = new ArrayList<Filter>();
+			Collection<Filter> userCollection = new ArrayList<Filter>();
+			Collection<Filter> dateCollection = new ArrayList<Filter>();
+			Collection<Filter> userDateCollection = new ArrayList<Filter>();
 			
-			predicates.add(recipient);
-			predicates.add(send);
+			userCollection.add(recipient);
+			userCollection.add(send);
 			
-			Query getGigs = new Query("Gig").setFilter( new CompositeFilter(CompositeFilterOperator.OR,predicates));
+			long toDays = 1000*60*60*24;
+			long numDays = 1+(endRange.getTime() - startRange.getTime()) / toDays;
+			
+			System.out.println("We Have "+numDays+" Days from "+startRange+" to "+endRange);
+
+			Date d = new Date();
+			
+			for(int i=0;i<numDays;i++){
+				
+				// Set the days
+				d.setTime(startRange.getTime()+toDays*i);
+				
+				// Clear the minor parts
+				d.setHours(0);
+				d.setMinutes(0);
+				d.setSeconds(0);	
+				
+				System.out.println("Adding for day: "+d);
+				
+				// Match date sent or replied
+				dateCollection.add(new FilterPredicate("dateSent",FilterOperator.EQUAL,d));
+				dateCollection.add(new FilterPredicate("dateReplied",FilterOperator.EQUAL,d));
+			}
+			
+			// We or the recipient or sender
+			CompositeFilter userFilter = new CompositeFilter(CompositeFilterOperator.OR,userCollection);
+			
+			// We or the date sent or replied
+			CompositeFilter dateFilter = new CompositeFilter(CompositeFilterOperator.OR,dateCollection);
+			
+			userDateCollection.add(userFilter);
+			userDateCollection.add(dateFilter);
+			
+			// We and the two previous date filter and user filter
+			CompositeFilter userDateFilter = new CompositeFilter(CompositeFilterOperator.AND,userDateCollection);
+			
+			// Get gigs meeting this query
+			Query getGigs = new Query("Gig").setFilter(dateFilter);
 			
 			PreparedQuery pqGetGigs = datastore.prepare(getGigs);
 			
@@ -151,6 +117,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			
 			// Reformat the empty array
 			gigs = new GigInfo[gigEntities.size()];
+			
+			System.out.println("We found "+gigEntities.size()+" gigs");
 			
 			for(int i=0;i<gigEntities.size();i++){
 				
@@ -163,11 +131,13 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 				gigs[i].name=((String)gigEntities.get(i).getProperty("name"));
 				gigs[i].dateSent = (Date)gigEntities.get(i).getProperty("dateSent");
 				gigs[i].dateReplied = (Date)gigEntities.get(i).getProperty("dateReplied");
+				
+				System.out.println(gigs[i].toString());
 			}
 			
 		}catch(Exception e){
 			
-			errorMessage = e.getMessage();
+			System.out.println(errorMessage = e.getMessage());
 			
 			return null;
 		}
@@ -176,6 +146,9 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		return gigs;
 	}
 	
+	/**
+	 * Search with a page and limit
+	 */
 	@Override
 	public UserInfo[] search(SearchInfo info, int limit, int offset) {
 		// TODO Auto-generated method stub
@@ -210,9 +183,14 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		
 		PreparedQuery pqSearchQuery = datastore.prepare(searchQuery);
 		
-		List<Entity> sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withLimit(limit).offset(limit*offset));
+		FetchOptions limitFetch = FetchOptions.Builder.withLimit(limit).offset(limit*offset);
+		FetchOptions firstFetch = info.date==null ? limitFetch : FetchOptions.Builder.withDefaults();
+		
+		List<Entity> sqEntities = pqSearchQuery.asList(firstFetch);
 		
 		if(info.date!=null){
+			
+			System.out.println(sqEntities.size()+" entities before date");
 			
 			Query dateQuery = null;
 			
@@ -233,30 +211,33 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			dateAnds.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,info.date));
 			
 			// Search for availability
-			dateQuery = new Query("Availability").setFilter(new CompositeFilter(CompositeFilterOperator.AND,dateAnds));
+			dateQuery = new Query("Availability").setFilter(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,info.date));
 			
 			PreparedQuery pqDateQuery = datastore.prepare(dateQuery);
 			
 			List<Entity> dqEntities = pqDateQuery.asList(FetchOptions.Builder.withDefaults());
 			
-			List<Filter> userDateOrs = new ArrayList<Filter>();
+			System.out.println(dqEntities.size()+"Entities after availablity query");
 			
-			for(int i=0;i<sqEntities.size();i++){
+			if(dqEntities.size()>0){
 				
-				// Add each band name
-				dateOrs.add(new FilterPredicate("username",FilterOperator.EQUAL,dqEntities.get(i).getProperty("bandName")));
-			}
-			
-			CompositeFilter compFilterDate = new CompositeFilter(CompositeFilterOperator.OR,userDateOrs);
-		
-			// Recreatthe query
-			searchQuery = new Query("User").setFilter(compFilterDate);
+				List<Filter> userDateOrs = new ArrayList<Filter>();
+				
+				sqEntities.clear();
+				
+				for(int i=0;i<dqEntities.size();i++){
 
-			// Re-prepare the query
-			pqSearchQuery = datastore.prepare(searchQuery);
+					try {
+						sqEntities.add(datastore.get(KeyFactory.createKey("User", (String)dqEntities.get(i).getProperty("bandName"))));
+					} catch (EntityNotFoundException e) {
+						// TODO Auto-generated catch block
+						System.out.println("ERror with: "+(String)dqEntities.get(i).getProperty("bandName")+"\n"+e.toString());
+					}
+				}
+				
+				System.out.println(sqEntities.size()+" Entities after search query with date");
 			
-			// Get new entities
-			sqEntities = pqSearchQuery.asList(FetchOptions.Builder.withDefaults());
+			}else sqEntities.clear();
 		}
 		
 		UserInfo[] returnUsers = new UserInfo[sqEntities.size()];
@@ -267,13 +248,15 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		return returnUsers;
 	}
 	
+	/**
+	 * Normal search
+	 */
 	@Override
 	public UserInfo[] search(SearchInfo info) {
 		// TODO Auto-generated method stub
 		return search(info,10,0);
 	}
 	
-
 	/**
 	 * Get all users
 	 */
@@ -345,6 +328,122 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		return users;
 	}
 	
+	/**
+	 * Get the top users
+	 */
+	public UserInfo[] getNewestUsers(int count){
+		
+		UserInfo[] users = null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Two queries on the datastorie
+		Query allUsers = new Query("User");
+
+		// Sort on descending
+		allUsers.addSort("dateJoined",SortDirection.DESCENDING);
+		
+		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
+
+		// Get all user entitiesin a list
+		List<Entity> userEntities = pqAllUsers.asList(FetchOptions.Builder.withLimit(count));
+		
+		users = new UserInfo[userEntities.size()];
+		
+		setUsersFromEntities(users, userEntities);
+		
+		return users;
+		
+	}
+	
+	/**
+	 * Get the top users
+	 */
+	@Override
+	public UserInfo[] getTopUsers(int count){
+		
+		UserInfo[] users = null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Two queries on the datastorie
+		Query allUsers = new Query("User");
+
+		// Sort on descending
+		allUsers.addSort("gigCount",SortDirection.DESCENDING);
+		
+		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
+
+		// Get all user entitiesin a list
+		List<Entity> userEntities = pqAllUsers.asList(FetchOptions.Builder.withLimit(count));
+		
+		users = new UserInfo[userEntities.size()];
+		
+		setUsersFromEntities(users, userEntities);
+		
+		return users;
+		
+	}
+	
+	/**
+	 * Get the top venues
+	 */
+	@Override
+	public UserInfo[] getTopVenues(int count){
+		
+		UserInfo[] users = null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Two queries on the datastorie
+		Query allUsers = new Query("User").setFilter(new FilterPredicate("type",FilterOperator.EQUAL,"venue"));
+
+		// Sort on descending
+		allUsers.addSort("gigCount",SortDirection.DESCENDING);
+		
+		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
+
+		// Get all user entitiesin a list
+		List<Entity> userEntities = pqAllUsers.asList(FetchOptions.Builder.withLimit(count));
+		
+		users = new UserInfo[userEntities.size()];
+		
+		setUsersFromEntities(users, userEntities);
+		
+		return users;
+		
+	}
+	
+	/**
+	 * Get the top musicians
+	 */
+	@Override
+	public UserInfo[] getTopMusicians(int count){
+		
+		UserInfo[] users = null;
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		// Two queries on the datastorie
+		Query allUsers = new Query("User").setFilter(new FilterPredicate("type",FilterOperator.EQUAL,"musician"));
+
+		// Sort on descending
+		allUsers.addSort("gigCount",SortDirection.DESCENDING);
+		
+		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
+
+		// Get all user entitiesin a list
+		List<Entity> userEntities = pqAllUsers.asList(FetchOptions.Builder.withLimit(count));
+		
+		users = new UserInfo[userEntities.size()];
+		
+		setUsersFromEntities(users, userEntities);
+		
+		return users;
+		
+	}
+	
+	
 	private void setUsersFromEntities(UserInfo[] users,List<Entity> availableEntities){
 
 		
@@ -374,6 +473,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		user.lastName = (String) entity.getProperty("lastName");
 		user.priceRange = (Double) entity.getProperty("priceRange");
 		user.openHours = (String) entity.getProperty("openHours");
+		user.gigCount = Integer.parseInt(entity.getProperty("gigCount").toString());
+		user.dateJoined = (Date) entity.getProperty("dateJoined");
 	}
 	
 	/**
@@ -414,6 +515,9 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		return gotUser;
 	}
 	
+	/**
+	 * Get the dates a specific user is available within a given range
+	 */
 	public Date[] getDatesAvailable(String username, Date start, Date end){
 
 		

@@ -4,15 +4,15 @@ import java.util.Date;
 
 import com.dynamic_confusion.mygig_planner.client.GigInfo;
 import com.dynamic_confusion.mygig_planner.client.SearchInfo;
+import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ServerSideServiceAsync {
 
 	
 	void getErrorMessage(AsyncCallback callback);
-	void sendOffer(GigInfo gig, AsyncCallback callback);
-	void rejectOffer(GigInfo gig, AsyncCallback callback);
-	void acceptOffer(GigInfo gig, AsyncCallback callback);
+	
+	void getOffers(String user, Date date, AsyncCallback callback);
 	void getOffers(String user, Date startRange, Date endRange, AsyncCallback callback);
 	
 	void getUsers(AsyncCallback callback);
@@ -24,4 +24,10 @@ public interface ServerSideServiceAsync {
 
 	void search(SearchInfo info, AsyncCallback callback);
 	void search(SearchInfo info,int limit, int offset, AsyncCallback callback);
+	
+
+	void getTopUsers(int count, AsyncCallback callback);
+	void getNewestUsers(int count, AsyncCallback callback);
+	void getTopMusicians(int count, AsyncCallback callback);
+	void getTopVenues(int count, AsyncCallback callback);
 }

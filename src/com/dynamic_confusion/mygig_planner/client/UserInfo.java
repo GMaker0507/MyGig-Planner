@@ -1,6 +1,7 @@
 package com.dynamic_confusion.mygig_planner.client;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.dynamic_confusion.mygig_planner.client.ui.Genre;
 
@@ -13,6 +14,9 @@ public class UserInfo implements Serializable {
 	
 	public String firstName = "first";
 	public String lastName = "last";
+	
+	public int gigCount = 0;
+	public Date dateJoined = new Date();
 	
 	public Double priceRange = 0.0;
 	public String phoneNumber = "123-555-1234";
@@ -28,10 +32,27 @@ public class UserInfo implements Serializable {
 	
 	public UserInfo(){
 		
+		dateJoined = new Date();
+		
+		dateJoined.setHours(0);
+		dateJoined.setMinutes(0);
+		dateJoined.setSeconds(0);
 	}
 	
 	public void randomize(){
+		
+		// Set the joined date
+		dateJoined.setYear(100+(int)Math.floor(Math.random()*13.0));
+		dateJoined.setMonth(1+(int)Math.floor(Math.random()*12.0));
+		dateJoined.setDate(1+(int)Math.floor(Math.random()*30.0));
+		
+		// Dont add any hours or minutes
+		dateJoined.setHours(0);
+		dateJoined.setMinutes(0);
+		dateJoined.setSeconds(0);
 
+		gigCount = (int)Math.floor(Math.random()*25.0);
+		
 		priceRange = 1005 + Math.random() * 1000;
 		
 		phoneNumber = (100+(int)Math.floor(Math.random()*899.0))+"-"+
@@ -58,6 +79,8 @@ public class UserInfo implements Serializable {
 		String emails3 = ((int)Math.floor(Math.random()*9999.0))+"";
 		
 		genre = Genre.GetRandomGenre();
+		
+		type = Math.random() > 0.5 ? "venue" : "musician";
 		
 		email = emails1[(int) ((int)(Math.random()*((double)emails1.length)))]+
 				emails2[(int) ((int)(Math.random()*((double)emails2.length)))]+emails3+"@"+

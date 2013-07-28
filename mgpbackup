@@ -15,8 +15,12 @@ import com.dynamic_confusion.mygig_planner.client.ui.ViewEditProfile;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HighlightEvent;
+import com.google.gwt.event.logical.shared.HighlightHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -30,6 +34,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
@@ -38,6 +43,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitHandler;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -88,17 +94,39 @@ public class MyGig_Planner implements EntryPoint {
 		final FormPanel form = new FormPanel();
 		final FormPanel profileForm = new FormPanel();
 		
-		profileForm.setWidget(profilePanel);
-		profileForm.setEncoding(FormPanel.ENCODING_URLENCODED);
-		profileForm.setMethod(FormPanel.METHOD_POST);
-		profileForm.setAction("/server-side/profile");
-		
 		
 		
 		form.setWidget(home);
 		form.setEncoding(FormPanel.ENCODING_URLENCODED);
 		form.setMethod(FormPanel.METHOD_POST);
-		form.setAction("/registration");
+		form.setAction("/servlet/registration");
+		
+		tp.addSelectionHandler(new SelectionHandler<Integer>(){
+
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				// TODO Auto-generated method stub
+				
+				Widget w = ((TabPanel)event.getSource()).getWidget(event.getSelectedItem());
+				
+				w.fireEvent(new GwtEvent<TabUpdateEvent.Handler>(){
+
+					@Override
+					public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
+						// TODO Auto-generated method stub
+						return TabUpdateEvent.GetType();
+					}
+
+					@Override
+					protected void dispatch(Handler handler) {
+						// TODO Auto-generated method stub
+						handler.onUpdate(null);
+					}
+					
+				});
+			}
+			
+		});
 		
 		// Add some default panels
 		tp.add(form,"Home");
@@ -152,7 +180,7 @@ public class MyGig_Planner implements EntryPoint {
 				String registerResults = event.getResults().trim();
 				
 				// If it says success
-				if(registerResults.equals("success")){
+				if(registerResults.indexOf("success")!=-1){
 					
 					// Set the cookie
 					Cookies.setCookie("activeUser", tbLoginUsername.getText());	
@@ -173,12 +201,104 @@ public class MyGig_Planner implements EntryPoint {
 		});
 					
 		final Button searchButton = new Button("Search!");
-		Button addDateButton = new Button("Add Date");
+		Button nextPageButton = new Button("Next Page");
+		Button previousPageButton = new Button("Previous Page");
+		
+		
+		final CheckBox useDateCheckbox = new CheckBox("Check Availability");
+		final CheckBox hasPACheckbox = new CheckBox("Has PA");
+		final CheckBox hasSoundPerson = new CheckBox("Has Sound Person");
+		final CheckBox onlyOriginalMusic = new CheckBox("Only Original Music");
+		
+		final AbsolutePanel results = new AbsolutePanel();
 		
 		final TextBox searchBox = new TextBox();
 		final DatePicker datePicker = new DatePicker();		
-		final List<Date> availableDates = new ArrayList<Date>();
 		
+		final GwtEvent<ClickHandler> gwtFirer = new GwtEvent<ClickHandler>(){
+
+			@Override
+			public com.google.gwt.event.shared.GwtEvent.Type<ClickHandler> getAssociatedType() {
+				// TODO Auto-generated method stub
+				return ClickEvent.getType();
+			}
+
+			@Override
+			protected void dispatch(ClickHandler handler) {
+				// TODO Auto-generated method stub
+				handler.onClick(null);
+			}
+			
+			
+		};
+
+		
+		useDateCheckbox.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				
+				useDateCheckbox.setText("Check Availability on " + datePicker.getValue()+"?");
+				
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				searchButton.fireEvent(gwtFirer);
+				
+			}
+			
+		});
+
+		
+		onlyOriginalMusic.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				searchButton.fireEvent(gwtFirer);
+				
+			}
+			
+		});
+		
+		hasSoundPerson.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				searchButton.fireEvent(gwtFirer);
+				
+			}
+			
+		});
+		
+		hasPACheckbox.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				searchButton.fireEvent(gwtFirer);
+				
+			}
+			
+		});
+		
+		datePicker.addValueChangeHandler(new ValueChangeHandler<Date>(){
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Date> event) {
+				// TODO Auto-generated method stub
+				
+				useDateCheckbox.setText("Check Availability on " + datePicker.getValue()+"?");
+
+				// TODO Auto-generated method stub
+				searchButton.fireEvent(gwtFirer);
+			}
+			
+		});
+				
 		searchButton.addClickHandler(new ClickHandler(){
 			
 			@Override
@@ -189,6 +309,17 @@ public class MyGig_Planner implements EntryPoint {
 				searchButton.setEnabled(false);
 				
 				SearchInfo info = new SearchInfo();
+				
+				info.hasPA = hasPACheckbox.getValue();
+				info.hasSoundPerson = hasSoundPerson.getValue();
+				info.onlyOriginalMusic = onlyOriginalMusic.getValue();
+				if(useDateCheckbox.getValue()){
+					info.date = datePicker.getValue();
+					info.date.setMinutes(0);
+					info.date.setSeconds(0);
+					info.date.setHours(0);
+				}
+				else info.date =null;
 				
 				// TODO populate other fields of the search info 
 				
@@ -210,12 +341,17 @@ public class MyGig_Planner implements EntryPoint {
 						searchButton.setText("Search");
 						searchButton.setEnabled(true);
 						
-						RootPanel.get().add(new HTML("Done with "+users.length+" results!"));
+						results.clear();
+						
+						results.add(new HTML("Done with "+users.length+" results!"));
 						
 						// TODO handle search results
 						for(int i=0;i<users.length;i++){
 
-							RootPanel.get().add(new HTML("<p>"+users[i].username+"</p>"));
+							results.add(new HTML("<p>"+users[i].username+
+									" - PA: "+users[i].hasPA+
+									" - Sound Person: "+users[i].hasSoundPerson+
+									" - Original Music: "+users[i].onlyOriginalMusic+"</p>"));
 						}
 						
 					}
@@ -224,14 +360,104 @@ public class MyGig_Planner implements EntryPoint {
 			}
 		});
 		
+		
 		search.add(datePicker);
-		search.add(addDateButton);
+		search.add(useDateCheckbox);
+		search.add(hasPACheckbox);
+		search.add(hasSoundPerson);
+		search.add(onlyOriginalMusic);
 		search.add(searchBox);
 		search.add(searchButton);
+		search.add(results);
 				
 		
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
+			
+			ssService.getUsers(new AsyncCallback(){
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+					
+					RootPanel.get().add(new HTML("<p>"+caught.getMessage()+"</p>"));
+				}
+				
+				public void onSuccess(Object result) {
+					
+					final UserInfo[] users = (UserInfo[])result;
+					
+
+					
+					home.add(new HTML("<h3>Users</h3>"));
+					
+					for(int i=0;i<users.length;i++){
+						
+						final String currentUserGridUser = users[i].username;
+						
+						Anchor sendOfferLink = new Anchor(currentUserGridUser +" - Send an Offer");
+						
+						home.add(sendOfferLink);
+						
+						sendOfferLink.addClickHandler(new ClickHandler(){
+							
+							@Override
+							public void onClick(ClickEvent event) {
+								// TODO Auto-generated method stub
+								GigInfo newGig = new GigInfo();
+								
+								newGig.sendUser=( Cookies.getCookie("activeUser"));
+								newGig.recipientUser = (currentUserGridUser);
+								newGig.dateSent = new Date();
+								newGig.name="gig";			
+								
+								RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,"/servlet/gig/send?"+
+										"sendUser="+newGig.sendUser+"&"+
+										"recipientUser="+newGig.recipientUser+"&"+
+										"name="+"gig");
+								
+								try {
+									rb.sendRequest("", new RequestCallback(){
+
+										@Override
+										public void onResponseReceived(
+												Request request, Response response) {
+											// TODO Auto-generated method stub
+											
+											String results = response.getText();
+											
+											if(results.indexOf("success")!=-1){
+												
+												home.add(new HTML("<p>Gig Offer Sent!</p>"));
+											}else home.add(new HTML(results));
+										}
+
+										@Override
+										public void onError(Request request,
+												Throwable exception) {
+											// TODO Auto-generated method stub
+											home.add(new HTML(exception.getMessage()));
+										}
+										
+										
+									});
+								} catch (RequestException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+									home.add(new HTML("<p>ERror trying to send request.</p>"));
+								}
+								
+								
+								
+								
+							}
+						});
+						
+						//<a href=\""+GWT.getModuleBaseURL()+"sendOffer\">Send an Offer</a>");
+						
+					}
+				};
+			});
 			
 			ssService.getOffers(new AsyncCallback(){
 				@Override
@@ -398,7 +624,7 @@ public class MyGig_Planner implements EntryPoint {
 											
 											String rText = response.getText();
 											
-											if(rText.equals("success")){
+											if(rText.indexOf("success")!=-1){
 												
 												Window.Location.reload();
 											}else{
@@ -590,42 +816,22 @@ public class MyGig_Planner implements EntryPoint {
 			horizontalPanel.add(registerSection);	
 		}
 		
-		// When a tab is selected
-		tp.addSelectionHandler(new SelectionHandler<Integer>(){
-
-			@Override
-			public void onSelection(SelectionEvent<Integer> event) {
-				// TODO Auto-generated method stub
-				
-				// Get its associated widget
-				Widget w = ((TabPanel)event.getSource()).getWidget(event.getSelectedItem());
-				
-				// Fire a tabupdate event
-				w.fireEvent(new GwtEvent<TabUpdateEvent.Handler>(){
-
-					@Override
-					public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
-						// TODO Auto-generated method stub
-						return TabUpdateEvent.GetType();
-					}
-
-					@Override
-					protected void dispatch(Handler handler) {
-						// TODO Auto-generated method stub
-						handler.onUpdate(null);
-					}
-					
-				});
-			}
+		tp.setSize("800px", "548px");
+		
+		// If we were passed a tab
+		if(Window.Location.getParameter("tab")!=null){
 			
-		});
+			// Get the tab index
+			int tabIndex = Integer.parseInt(Window.Location.getParameter("tab"));
+			
+			// Select the tab
+			tp.selectTab(tabIndex);
+		}
 		
-		// Add to the proper container
-		RootPanel.get("mgpContent").add(tp);
-		
-		// Populate the service lists
+		// Populate Users Lists
 		SiteDesign.PopulateUsersLists(ssService);
 		
+		RootPanel.get("mgpContent").add(tp);
 		DOM.setElementAttribute(tp.getElement(), "id","mainTabPanel");
 	}
 

@@ -20,10 +20,13 @@ public interface ServerSideService extends RemoteService {
 	UserInfo[] search(SearchInfo info,int limit, int offset);
 
 	String getErrorMessage();
-	
-	String sendOffer(GigInfo gig);
-	String acceptOffer(GigInfo gig);
-	String rejectOffer(GigInfo gig);
+
+	GigInfo[] getOffers(String user, Date date);
 	GigInfo[] getOffers(String user, Date startRange, Date endRange);
+	
+	UserInfo[] getTopUsers(int count);
+	UserInfo[] getNewestUsers(int count);
+	UserInfo[] getTopMusicians(int count);
+	UserInfo[] getTopVenues(int count);
 
 }
