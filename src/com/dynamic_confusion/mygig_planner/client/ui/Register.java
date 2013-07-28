@@ -40,7 +40,7 @@ public class Register extends Composite {
 		registerForm.setWidget(verticalPanel);
 		registerForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		registerForm.setMethod(FormPanel.METHOD_POST);
-		registerForm.setAction("/registration");
+		registerForm.setAction("/servlet/registration");
 		
 		Label lblRegisterHeading = new Label("New User? Start here!");
 		lblRegisterHeading.setStyleName("gwt-Label-Header");
@@ -121,16 +121,13 @@ public class Register extends Composite {
 					
 					// Reload
 					Window.Location.reload();
-
 				}
 				else {
-
+					
+					// TODO handle output of error message
 					String errorMessage = registerResults;
 					
 					Window.alert(errorMessage);
-					// TODO handle output of error message
-					
-					//home.add(new HTML(errorMessage));
 				}
 			}
 		});

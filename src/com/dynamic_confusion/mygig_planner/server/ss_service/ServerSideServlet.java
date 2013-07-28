@@ -432,11 +432,12 @@ public class ServerSideServlet extends HttpServlet {
 			}else throw new Exception("Invalid username/password combination");
 			
 			
-		}catch(Exception e){
+		}
+		catch(Exception e){
+			
+			e.printStackTrace();
 			
 			out.println(e.getMessage());
-			
-			
 		}
 	}
 
@@ -489,6 +490,7 @@ public class ServerSideServlet extends HttpServlet {
 			out.print("success");
 		}catch(Exception e){
 			
+			e.printStackTrace();
 			out.print(e.getMessage());
 		}
 		
@@ -611,7 +613,7 @@ public class ServerSideServlet extends HttpServlet {
 			System.out.println((i+1)+". "+split[i]);
 		}
 		
-		// Process acoordingly
+		// Process accordingly
 		if(action.equals("admin"))processAdminRequest(req, resp);
 		else if(action.equals("login"))processLoginRequest(req, resp);
 		else if(action.equals("register"))processRegistrationRequest(req, resp);

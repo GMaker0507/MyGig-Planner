@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class SearchInfo implements IsSerializable {
 	
-	public String genre = null;
+	public String[] genre = null;
 	
 	public Date date = null;
 	
