@@ -608,7 +608,7 @@ public class ServerSideServlet extends HttpServlet {
 		for(int i=0;i<split.length;i++)
 		{
 			// Output the contents of the split
-			System.out.println((i+1)+". "+split[i]);
+			out.println((i+1)+". "+split[i]);
 		}
 		
 		// Process acoordingly
