@@ -16,6 +16,7 @@ import com.dynamic_confusion.mygig_planner.client.UserInfo;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -75,6 +76,7 @@ public class ServerSideServlet extends HttpServlet {
 					
 					// Set the date it was sent
 					getEntity.setProperty("dateReplied",new Date());
+					getEntity.setProperty("sortDate",new Date());
 					
 					datastore.put(getEntity);
 
@@ -102,6 +104,7 @@ public class ServerSideServlet extends HttpServlet {
 			gigOffer.setProperty("sendUser",req.getParameter("sendUser"));
 			gigOffer.setProperty("recipientUser", req.getParameter("recipientUser"));
 			gigOffer.setProperty("dateSent",new Date());
+			gigOffer.setProperty("sortDate",new Date());
 			gigOffer.setProperty("status",zero);
 			
 			// Put it in the datastore
@@ -158,63 +161,62 @@ public class ServerSideServlet extends HttpServlet {
 		PreparedQuery pqAllUsers = datastore.prepare(allUsers);
 		
 		List<Entity> entityAllUsers = pqAllUsers.asList(FetchOptions.Builder.withDefaults());
+
+		Date today = new Date();
+		
+		Date monthStart = new Date();
+		monthStart.setDate(1);
 		
 		// For each user
 		for(int h=0;h<entityAllUsers.size();h++){
 
-			Date today = new Date();
 			int year = today.getYear();
 			int month = today.getMonth();
 			int months = 1+(int)Math.floor(Math.random()*3.0);
 			
+			int max = 51;
+			int min = 10;
+			int num = (min+ (int)Math.floor(Math.random()*(max-min)));
+			
+			
 			// For each month
-			for(int j=0;j<months;j++){
+			for(int j=0;j<num;j++){
 				
-				
-				/// The dates in a month
-				int[] days = new int[]{
-					1,2,3,4,5,6,7,8,9,10,
-					11,1,2,13,14,15,16,17,18,19,20,
-					21,22,23,24,25,26,27,28,29,30,31
-				};
-				
-				int numDays = 1+(int)Math.floor(Math.random()*30.0);
-				
-				// For each day
-				for(int k=0;k<numDays;k++){
 					
-					int ni = (int)Math.floor(Math.random()*31.0);
-					
-					// Dont use it if its negative one
-					if(days[ni]==-1)continue;
-					
-					// Whats the negative one
-					int date = days[ni];
-					
-					days[ni] = -1;
-					
-					String user = (String) entityAllUsers.get(h).getProperty("username");
+				String user = (String) entityAllUsers.get(h).getProperty("username");
 
-					Date dt  = new Date(year,month+j,date);
-					Entity newAvailability = new Entity("Availability",user+dt.toString());
-					
-					
-					// Set the bandis availablie on this date
-					newAvailability.setProperty("dateAvailable",dt);
-					newAvailability.setProperty("bandName", user);
-					
-					// Add to the datastore
-					datastore.put(newAvailability);
-					
-					out.println(entityAllUsers.get(h).getProperty("username")+" is available on "+dt.toString());
+				Date dt  = new Date(monthStart.getTime()+num*24*60*60*1000);
+				dt.setHours(0);
+				dt.setMinutes(0);
+				dt.setSeconds(0);
 				
+				// If this availability entity exists
+				// Do not go on
+				try {
+					if(datastore.get(KeyFactory.createKey("Availability",user+dt.toString()))!=null)continue;
+				} catch (EntityNotFoundException e) {
 				}
+				
+				Entity newAvailability = new Entity("Availability",user+dt.toString());
+				
+				
+				// Set the bandis availablie on this date
+				newAvailability.setProperty("dateAvailable",dt);
+				newAvailability.setProperty("bandName", user);
+				
+				// Add to the datastore
+				datastore.put(newAvailability);
+				
+				out.println(entityAllUsers.get(h).getProperty("username")+" is available on "+dt.toString());
+				
+				
 			}	
 		}
 	}
 	
 	private void generateGigs(){
-		
+
+		Date today = new Date();
 
 		Query allUsers = new Query("User");
 		
@@ -222,7 +224,10 @@ public class ServerSideServlet extends HttpServlet {
 		
 		List<Entity> entityAllUsers = pqAllUsers.asList(FetchOptions.Builder.withDefaults());
 		
-		int num = (int)Math.floor(Math.random()*20.0);
+		int num = 10+(int)Math.floor(Math.random()*30.0);
+		
+		Date dUse = new Date();
+		Date dUse2 = new Date();
 		
 		for(int i=0;i<entityAllUsers.size();i++){
 
@@ -237,25 +242,32 @@ public class ServerSideServlet extends HttpServlet {
 				Entity gigOffer = new Entity("Gig");
 				
 				int zero = 0;
+
+				long replyDays = Long.parseLong((int)Math.floor(Math.random()*((double)31.0))*24*60*60*1000+"");
+				long sendDays = replyDays + Long.parseLong((int)Math.floor(Math.random()*((double)31.0))+"")*24*60*60*1000;
+				dUse = new Date();
+				dUse.setTime(today.getTime()-sendDays);
+				dUse.setHours(0);
+				dUse.setMinutes(0);
+				dUse.setSeconds(0);
 				
-				int m = 1+(int)Math.floor(Math.random()*((double)12));
-				int d = 1+(int)Math.floor(Math.random()*((double)31));
-				int m2 = m==12 ? m : m+(int)Math.floor(Math.random()*((double)(12-m)));
-				int d2 = d==31 ? d : d+(int)Math.floor(Math.random()*((double)(31-d)));
-				
-				boolean rep = Math.random()>0.3;
-				
-				int y = (int)Math.floor(Math.random()*((double)3));
-				
+				boolean rep = Math.random()>0.3;				
 				int repN = rep?(Math.random()> 0.5 ? -1 : 1):0;
 				
 				// Set the gig information
 				gigOffer.setProperty("name",user1Entity.getProperty("random-gig-1."+Math.random()));
 				gigOffer.setProperty("sendUser",user1Entity.getProperty("username"));
 				gigOffer.setProperty("recipientUser", user2Entity.getProperty("username"));
-				gigOffer.setProperty("dateSent",new Date(113-y,m,d));
-				gigOffer.setProperty("dateReplied",rep ? new Date(113,m2,d2) : null);
+				gigOffer.setProperty("dateSent",dUse);
+				dUse2 = new Date();
+				dUse2.setTime(today.getTime()-replyDays);
+				dUse2.setHours(0);
+				dUse2.setMinutes(0);
+				dUse2.setSeconds(0);
+				
+				gigOffer.setProperty("dateReplied",rep ? dUse2 : null);
 				gigOffer.setProperty("status",rep ? zero : repN);
+				gigOffer.setProperty("sortDate",rep ? dUse : dUse2);
 				
 				String rpd = repN == 1 ? "Accepted" : "Rejected";
 				
