@@ -101,7 +101,13 @@ public class Calendar extends Composite {
 			@Override
 			public void onUpdate(TabUpdateEvent event) {
 				// TODO Auto-generated method stub
+				update();
 			}
 		}, TabUpdateEvent.GetType());
+	}
+	
+	private void update(){
+		
+		
 	}
 }

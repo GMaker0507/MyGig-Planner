@@ -1,7 +1,10 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
+import com.dynamic_confusion.mygig_planner.client.TabUpdateEvent;
+import com.dynamic_confusion.mygig_planner.client.TabUpdateEvent.Handler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -17,7 +20,11 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 
 public class Register extends Composite {
 
-	public Register() {
+	public Home homeParent = null;
+	
+	public Register(Home homeParent) {
+		
+		this.homeParent = homeParent;
 		
 		final TextBox userTextBox = new TextBox(), fnameTextBox = new TextBox(), lnameTextBox = new TextBox();
 		final TextBox addressTextBox = new TextBox(), phonenumberTextBox = new TextBox(), genreTextBox = new TextBox();
@@ -75,11 +82,16 @@ public class Register extends Composite {
 		registerButton.setSize("100px", "36px");
 		flexTable.setWidget(14, 0, registerButton);
 		
+		final Button registerButtonFinal = registerButton;
+		
 		// On clicking registerButton events
 		registerButton.addClickHandler(new ClickHandler(){
 					
 			@Override
 			public void onClick(ClickEvent event) {
+				
+				registerButtonFinal.setText("Proccessing...");
+				registerButtonFinal.setEnabled(false);
 				
 				// If the username and password and verpassword text boxes are empty, ask user to fill it
 				if (userTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || verpassTextBox.getText().isEmpty()) {
@@ -95,13 +107,13 @@ public class Register extends Composite {
 				
 				else {
 					
-					Window.alert("Registration successful!");
 					// Submit the form
 					registerForm.submit();	
-					Window.Location.reload();
 				}	
 			}
 		});
+		
+		final Home homeParentFinal = homeParent;
 				
 		registerForm.addSubmitCompleteHandler(new SubmitCompleteHandler(){
 			
@@ -111,6 +123,9 @@ public class Register extends Composite {
 				
 				String registerResults = event.getResults().trim();
 				
+				registerButtonFinal.setText("Register");
+				registerButtonFinal.setEnabled(true);
+				
 				// If it says success
 				if (registerResults.indexOf("success") != -1) {
 					
@@ -119,8 +134,25 @@ public class Register extends Composite {
 					// Set the cookie
 					Cookies.setCookie("activeUser", userTextBox.getText());	
 					
-					// Reload
-					Window.Location.reload();
+					// CReate the event to fire
+					GwtEvent<TabUpdateEvent.Handler> g = new GwtEvent<TabUpdateEvent.Handler>(){
+
+						@Override
+						public com.google.gwt.event.shared.GwtEvent.Type<Handler> getAssociatedType() {
+							// TODO Auto-generated method stub
+							return TabUpdateEvent.GetType();
+						}
+
+						@Override
+						protected void dispatch(Handler handler) {
+							// TODO Auto-generated method stub
+							handler.onUpdate(null);
+						}
+						
+					};
+					
+					homeParentFinal.fireEvent(g);
+					homeParentFinal.updateLoginState();
 				}
 				else {
 					
