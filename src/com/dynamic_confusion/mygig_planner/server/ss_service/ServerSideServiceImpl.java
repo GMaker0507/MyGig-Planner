@@ -120,6 +120,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			
 			System.out.println("We found "+gigEntities.size()+" gigs");
 			
+			if(gigEntities.size()>0) System.out.println("Printing the first gig " + gigEntities.get(0).toString());
+			
 			for(int i=0;i<gigEntities.size();i++){
 				
 				// Populate the array
@@ -136,7 +138,7 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			}
 			
 		}catch(Exception e){
-			
+			e.printStackTrace();
 			System.out.println(errorMessage = e.getMessage());
 			
 			return null;
