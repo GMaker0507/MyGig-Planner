@@ -94,8 +94,7 @@ public class Browse extends Composite {
 					availableOnly = false;
 				}
 			});
-			
-			radioBtnAll.setText("All Bands");
+			radioBtnAll.setText("Not Available");
 			radioBtnAll.setFormValue("available");
 			absolutePanel.add(radioBtnAll, 10, 25);
 			radioBtnAll.setSize("110px", "20px");
@@ -299,6 +298,13 @@ public class Browse extends Composite {
 		form.clear();
 		
 		SearchInfo searchInfo = new SearchInfo();
+		searchInfo.hasPA = requiresPA;
+		searchInfo.hasHospitalityPack = requiresHospPack;
+		searchInfo.isAvailable = availableOnly;
+		searchInfo.onlyOriginalMusic = original;
+		searchInfo.hasSoundPerson = needsSoundPerson;
+		searchInfo.genre = (String[])genre.toArray();
+		
 		if( txtbxminCapacity.getValue().equals("") )
 			minCapacity = 0;
 		if( txtbxmaxPay.getValue().equals("") )
@@ -323,7 +329,7 @@ public class Browse extends Composite {
 					Label email = new Label(userInfo[i].email);
 					
 					resultsPanel.add(username, 10, 50*(i+5));
-					resultsPanel.add(email, 50, 50*(i+5));
+					resultsPanel.add(email, 200, 50*(i+5));
 					
 				}
 			}
