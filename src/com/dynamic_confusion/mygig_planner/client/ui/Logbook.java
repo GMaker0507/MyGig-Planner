@@ -57,36 +57,36 @@ public class Logbook extends Composite {
 		absolutePanel.setSize("800px", "514px");
 		
 		Button btnLastButton = new Button("New button");
-		btnLastButton.setText("Last");
-		absolutePanel.add(btnLastButton, 126, 305);
-		btnLastButton.setSize("81px", "28px");
+		btnLastButton.setText("Last Page");
+		absolutePanel.add(btnLastButton, 10, 270);
+		btnLastButton.setSize("197px", "28px");
 		
 		Label lblLogbook = new Label("Logbook");
 		lblLogbook.setStyleName("gwt-Label-Header");
 		absolutePanel.add(lblLogbook, 207, 11);
 		
 		DatePicker datePicker = new DatePicker();
-		absolutePanel.add(datePicker, 10, 47);
+		absolutePanel.add(datePicker, 10, 12);
 		datePicker.setSize("157px", "181px");
 		
 		this.datePicker = datePicker;
 		
 		grdLogbook = new Grid(11, 3);
-		absolutePanel.add(grdLogbook, 214, 82);
-		grdLogbook.setSize("576px", "372px");
+		absolutePanel.add(grdLogbook, 214, 47);
+		grdLogbook.setSize("576px", "457px");
 		
 		Button btnMore = new Button("New button");
-		btnMore.setText("More");
-		absolutePanel.add(btnMore, 126, 271);
-		btnMore.setSize("81px", "28px");
+		btnMore.setText("Next Page");
+		absolutePanel.add(btnMore, 10, 236);
+		btnMore.setSize("197px", "28px");
 		
 		Button btnFirstButton = new Button("New button");
-		btnFirstButton.setText("First");
-		absolutePanel.add(btnFirstButton, 126, 237);
-		btnFirstButton.setSize("81px", "28px");
+		btnFirstButton.setText("First Page");
+		absolutePanel.add(btnFirstButton, 10, 202);
+		btnFirstButton.setSize("197px", "28px");
 		
 		txtGigsFor = new TextBox();
-		absolutePanel.add(txtGigsFor, 214, 46);
+		absolutePanel.add(txtGigsFor, 214, 11);
 		txtGigsFor.setSize("564px", "16px");
 		
 		final Logbook lgb = this;
@@ -359,12 +359,12 @@ public class Logbook extends Composite {
 			weekGrid.setHTML(i,0,"<p>"+weekGigs.get(index).toLogbookString(Cookies.getCookie("activeUser"))+"</p>");
 			
 			// If the recipient isthe active users
-			if(gigs[i].recipientUser.equals(Cookies.getCookie("activeUser"))&&gigs[i].status==0&&gigs[i].sort==0){
+			if(weekGigs.get(index).recipientUser.equals(Cookies.getCookie("activeUser"))&&(weekGigs.get(index).status==0)&&(weekGigs.get(index).sort==0)){
 				
-				final Anchor acceptAnchor = new Anchor("Accept");
-				final Anchor rejectAnchor = new Anchor("Reject");
+				final Button acceptAnchor = new Button("Accept");
+				final Button rejectAnchor = new Button("Reject");
 				
-				final String gigKey = weekGigs.get(i).key;
+				final String gigKey = weekGigs.get(index).key;
 				
 				acceptAnchor.addClickHandler(new ClickHandler(){
 
@@ -388,11 +388,7 @@ public class Logbook extends Composite {
 									
 									if(results.indexOf("success")!=-1){
 										
-										acceptAnchor.setText("Gig");
-										acceptAnchor.setEnabled(false);
-										
-										rejectAnchor.setText("Accepted");
-										rejectAnchor.setEnabled(false);
+										update();
 									}
 								}
 
@@ -436,12 +432,8 @@ public class Logbook extends Composite {
 									String results = response.getText();
 									
 									if(results.indexOf("success")!=-1){
-										
-										acceptAnchor.setText("Gig");
-										acceptAnchor.setEnabled(false);
-										
-										rejectAnchor.setText("Rejected");
-										rejectAnchor.setEnabled(false);
+
+										update();
 									}
 								}
 
