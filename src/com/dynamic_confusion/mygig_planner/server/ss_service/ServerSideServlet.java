@@ -26,6 +26,7 @@ import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.gwt.user.client.Window;
 
 @SuppressWarnings("serial")
 public class ServerSideServlet extends HttpServlet {
@@ -504,11 +505,17 @@ public class ServerSideServlet extends HttpServlet {
 			
 			Entity newUser = datastore.get(KeyFactory.createKey("User", req.getParameter("username")));
 			
+			System.out.println("Has HP: "+req.getParameter("hasHospitalityPack"));
+			
 			// Set the other user entity properties
-			newUser.setProperty("hasHospitalityPack", req.getParameter("hasHospitalityPack")=="true");
-			newUser.setProperty("hasPA", req.getParameter("hasPA")=="true");
-			newUser.setProperty("hasSoundPerson", req.getParameter("hasSoundPerson")=="true");
-			newUser.setProperty("onlyOriginalMusic", req.getParameter("onlyOriginalMusic")=="true");
+			newUser.setProperty("hasHospitalityPack", req.getParameter("hasHospitalityPack")=="true"||
+													  req.getParameter("hasHospitalityPack")=="on");
+			newUser.setProperty("hasPA", req.getParameter("hasPA")=="true"||
+					  req.getParameter("hasHospitalityPack")=="on");
+			newUser.setProperty("hasHospitalityPack", req.getParameter("hasSoundPerson")=="true"||
+					  req.getParameter("hasSoundPerson")=="on");
+			newUser.setProperty("onlyOriginalMusic", req.getParameter("onlyOriginalMusic")=="true"||
+					  req.getParameter("onlyOriginalMusic")=="on");
 			newUser.setProperty("openHours", req.getParameter("openHours"));
 		
 			// Add the new user to the datastore
@@ -516,7 +523,9 @@ public class ServerSideServlet extends HttpServlet {
 		
 		}catch(Exception e){
 			
-			
+			e.printStackTrace();
+
+			out.println(e.getMessage());
 		}
 	}
 	
