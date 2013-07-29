@@ -3,6 +3,7 @@ package com.dynamic_confusion.mygig_planner.client.ui;
 /*
 public enum GenreEnum {
 	ROCK, COUNTR, METAL, PUNK, SKA, REGGAE, BLUEGRASS, POP, HIPHOOP, INDUSTRIAL, ROCKABILLY
+>>>>>>> branch 'master' of https://github.com/GMaker0507/MyGig-Planner.git
 }
 */
 

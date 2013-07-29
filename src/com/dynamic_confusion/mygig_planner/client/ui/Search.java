@@ -8,9 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -18,21 +16,18 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
 public class Search extends Composite {
+	VerticalPanel form;
 	private TextBox searchTextBox;
 	private FlexTable searchTable;
 	private ServerSideServiceClientImpl ssService;
 	
-	public Search(ServerSideServiceClientImpl ssService) {
+	public Search(final ServerSideServiceClientImpl ssService) {
 		
 		this.ssService = ssService;
-		searchTable = new FlexTable();
 		
-		VerticalPanel form = new VerticalPanel();
+		form = new VerticalPanel();
 		initWidget(form);
-		form.setSize("870px", "490px");
-		
-		form.add(searchTable);
-		searchTable.setSize("700px", "700px");
+		form.setSize("800px", "512");
 		
 		// Search Title label
 		Label searchLabel = new Label("Search");
@@ -57,25 +52,30 @@ public class Search extends Composite {
 		searchButton.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent event) {
 				getResults();
-				Window.alert(searchTextBox.getText());
 			}
 		});
 		searchButton.setText("Search");
 		
 		// Advanced Search text
 		Label advancedSearchText = new Label("Advanced Search... ");
+		advancedSearchText.addClickHandler(new ClickHandler(){
+			public void onClick(ClickEvent event) {
+				form.clear();
+				form.add(new Browse(ssService));
+			}
+		});
 		searchFlexTable.setWidget(1, 1, advancedSearchText);
 		advancedSearchText.setStyleName("mgp-Link");
+		
 		
 		
 		// Results from search are shown in this panel
 		ScrollPanel scrollPanel = new ScrollPanel();
 		form.add(scrollPanel);
 		scrollPanel.setSize("690px", "381px");
-		
-		FlexTable searchResultsPanel = new FlexTable();
-		scrollPanel.setWidget(searchResultsPanel);
-		searchResultsPanel.setSize("100%", "388px");
+		searchTable = new FlexTable();
+		scrollPanel.setWidget(searchTable);
+		searchTable.setSize("100%", "100%");
 		
 		
 	}
@@ -110,6 +110,8 @@ public class Search extends Composite {
 						}
 					}
 				}
+				if(numRow == 0)
+					searchTable.setWidget(0, 0, new Label("No Results Found."));
 			}
 		});
 	}
