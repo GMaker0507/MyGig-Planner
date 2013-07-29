@@ -3,8 +3,6 @@ package com.dynamic_confusion.mygig_planner.client.ui;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -30,7 +28,7 @@ public class Login extends Composite {
 		loginForm.setWidget(verticalPanel);
 		loginForm.setEncoding(FormPanel.ENCODING_URLENCODED);
 		loginForm.setMethod(FormPanel.METHOD_GET);
-		loginForm.setAction("/login");
+		loginForm.setAction("/servlet/login");
 		
 		Label label0 = new Label("Log In");
 		label0.setStyleName("gwt-Label-Header");
@@ -87,14 +85,13 @@ public class Login extends Composite {
 				String loginResults = event.getResults().trim();
 				
 				// If it says success
-				if(loginResults.equalsIgnoreCase("success")){
+				if(loginResults.indexOf("success") != -1){
 					
 					// Set the cookie
 					Cookies.setCookie("activeUser", userTextBox.getText());	
 					
 					// Reload
 					Window.Location.reload();
-					
 				}
 				else {
 					

@@ -92,7 +92,7 @@ public class MyGig_Planner implements EntryPoint {
 			tp.add(new Calendar(ssService),"Home");
 			tp.add(logout, "Log Out");
 			
-			Button logoutButton = new Button("Log Out");
+			final Button logoutButton = new Button("Log Out");
 			
 			logout.add(logoutButton);
 			
@@ -102,6 +102,7 @@ public class MyGig_Planner implements EntryPoint {
 				public void onClick(ClickEvent event) {
 					// TODO Auto-generated method stub
 					
+					logoutButton.setText("Wait...");
 					Cookies.removeCookie("activeUser");
 					
 					// Reload the page
