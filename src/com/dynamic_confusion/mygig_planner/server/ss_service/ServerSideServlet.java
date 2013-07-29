@@ -432,11 +432,10 @@ public class ServerSideServlet extends HttpServlet {
 			}else throw new Exception("Invalid username/password combination");
 			
 			
-		}catch(Exception e){
+		}
+		catch(Exception e){
 			
 			out.println(e.getMessage());
-			
-			
 		}
 	}
 

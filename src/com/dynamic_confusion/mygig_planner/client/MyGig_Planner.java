@@ -70,19 +70,11 @@ public class MyGig_Planner implements EntryPoint {
 		// Set the width
 		tp.setWidth("800px");
 		
-		Grid filesGrid = new Grid(6, 1);
-		
-		filesGrid.setHTML(0, 0, "Project Management Plan");
-		filesGrid.setHTML(1, 0, "Software Requirements Specification");
-		filesGrid.setHTML(2, 0, "High Level Design");
-		filesGrid.setHTML(3, 0, "Low Level Design");
-		
 		final AbsolutePanel home = new AbsolutePanel();
 		final AbsolutePanel profilePanel = new AbsolutePanel();
 		final AbsolutePanel search = new AbsolutePanel();
-		final AbsolutePanel loginPanel = new AbsolutePanel();
 		final AbsolutePanel logbook = new AbsolutePanel();
-		final AbsolutePanel gigCalendar = new AbsolutePanel();
+		final AbsolutePanel logout = new AbsolutePanel();
 		
 		
 		final FormPanel form = new FormPanel();
@@ -93,24 +85,18 @@ public class MyGig_Planner implements EntryPoint {
 		profileForm.setMethod(FormPanel.METHOD_POST);
 		profileForm.setAction("/server-side/profile");
 		
-		
-		
-		form.setWidget(home);
-		form.setEncoding(FormPanel.ENCODING_URLENCODED);
-		form.setMethod(FormPanel.METHOD_POST);
-		form.setAction("/registration");
-		
-		// Add some default panels
-		tp.add(form,"Home");
-		
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
 			
-			Button logout = null;
+			// Add some default panels
+			tp.add(new Calendar(ssService),"Home");
+			tp.add(logout, "Log Out");
 			
-			RootPanel.get().add(logout = new Button("Logout"));
+			Button logoutButton = new Button("Log Out");
 			
-			logout.addClickHandler(new ClickHandler(){
+			logout.add(logoutButton);
+			
+			logoutButton.addClickHandler(new ClickHandler(){
 				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -125,15 +111,12 @@ public class MyGig_Planner implements EntryPoint {
 			});
 		
 			tp.add(new Logbook(ssService),"Logbook");
-			tp.add(gigCalendar,"Calendar");
 			tp.add(new ViewEditProfile(ssService),"View/Edit Profile");
 			tp.add(new Search(ssService),"Search/Browse");
-			tp.add(search,"Allen is a Search Desk");
 		
 		}//else tp.add(loginForm,"Login");
 		
 		tp.add(new HTML("tab 3"),"Help");
-		tp.add(filesGrid,"Project Files & Information");
 		
 		final TextBox tbLoginUsername = new TextBox();
 		final TextBox tbLoginPassword = new TextBox();
@@ -177,7 +160,6 @@ public class MyGig_Planner implements EntryPoint {
 		
 		final TextBox searchBox = new TextBox();
 		final DatePicker datePicker = new DatePicker();		
-		final List<Date> availableDates = new ArrayList<Date>();
 		
 		searchButton.addClickHandler(new ClickHandler(){
 			
@@ -267,8 +249,6 @@ public class MyGig_Planner implements EntryPoint {
 					
 						// TODO Auto-generated method stub
 						GigInfo[] gigs = (GigInfo[])result;
-						
-						Grid gigGrid = new Grid(gigs.length,1);
 
 						// Add the header
 						logbook.add(new HTML("<h3>Gig Offers</h3>"));
@@ -322,117 +302,7 @@ public class MyGig_Planner implements EntryPoint {
 				
 			});
 			
-			Date monthStart, monthEnd;
-			Date today = new Date();
-			
-			final int month = today.getMonth();
-			final int year = today.getYear();
-			
-			monthStart = new Date(year,month,1);
-			monthEnd = new Date(year, month, 31);
-			
-			this.ssService.getDatesAvailable(Cookies.getCookie("activeUser"),monthStart,monthEnd,new AsyncCallback(){
-
-				@Override
-				public void onFailure(Throwable caught) {
-					// TODO Auto-generated method stub
-					home.add(new HTML("Error trying to get availability."));
-				}
-
-				@Override
-				public void onSuccess(Object result) {
-					// TODO Auto-generated method stub
-					
-					Date[] dates = (Date[])result;
-					
-					Grid calender = new Grid(5,7);
-					
-					int ci = 0;
-					int ri = 0;
-
-					for(int i=0;i<31;i++){
-						
-						final int date = i+1;
-						Date di = new Date(year,month,date);
-						
-						boolean isAvailable = false;
-						
-						for(int j=0;j<dates.length;j++){
-							
-							if(di.equals(dates[j])==false)continue;
-							
-							isAvailable = true;
-							break;
-						}
-
-						Anchor caAnchor = null;
-						
-						if(isAvailable)caAnchor = new Anchor("[Available] - "+di.toString());				
-						else caAnchor = new Anchor("[Not Available] - "+di.toString());
-						
-						caAnchor.addClickHandler(new ClickHandler(){
-							
-							public void onClick(ClickEvent event) {
-								
-								RequestBuilder rb = new RequestBuilder(RequestBuilder.GET,"/changeAvailability?"
-										+ "user="+Cookies.getCookie("activeUser")+"&"
-										+ "year="+year+"&"
-										+ "month="+month+"&"
-										+ "date="+date);
-								
-								try {
-									rb.sendRequest(null,new RequestCallback(){
-										
-										@Override
-										public void onError(Request request,
-												Throwable exception) {
-											// TODO Auto-generated method stub
-											home.add(new HTML(exception.getMessage()));
-											
-										}
-										
-										@Override
-										public void onResponseReceived(
-												Request request, Response response) {
-											// TODO Auto-generated method stub
-											
-											String rText = response.getText();
-											
-											if(rText.equals("success")){
-												
-												Window.Location.reload();
-											}else{
-												
-												home.add(new HTML(rText));
-											}
-										}
-									});
-								} catch (RequestException e) {
-									// TODO Auto-generated method stub
-									home.add(new HTML(e.getMessage()));
-								}
-								
-							};
-						});
-						
-						calender.setWidget(ri,ci, caAnchor);
-							
-						ci = ci+1;
-						if(ci==7)ri++;
-						ci = ci % 7;
-						
-					}
-					
-					home.add(calender);
-				}
-				
-			});
-			
-			// Start adding to gigCalendar tab
-			HorizontalPanel calendarPanel = new HorizontalPanel();
-			gigCalendar.add(calendarPanel);
-			Calendar calendar = new Calendar();
-			gigCalendar.add(calendar);
+		
 			
 			String profileUser = Window.Location.getParameter("user") ==null ? Cookies.getCookie("activeUser") : Window.Location.getParameter("user");
 			
@@ -535,8 +405,6 @@ public class MyGig_Planner implements EntryPoint {
 							
 						UserInfo userObj = (UserInfo)result;
 						
-
-						
 						// Show we have nothing good
 						if(userObj==null)profilePanel.add(new HTML("No valid user given to show!"));
 						else{
@@ -567,12 +435,11 @@ public class MyGig_Planner implements EntryPoint {
 				
 			}
 			
-			
-			
-		}else{
+		}
+		else {
 			
 			HorizontalPanel horizontalPanel = new HorizontalPanel();
-			home.add(horizontalPanel);
+			tp.add(horizontalPanel, "Home");
 			
 			// Adding the login section
 			// login button is implemented in Login class
