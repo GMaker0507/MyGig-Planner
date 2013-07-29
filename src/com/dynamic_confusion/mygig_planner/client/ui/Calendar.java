@@ -80,6 +80,12 @@ public class Calendar extends Composite {
     		                	verticalPanel.add(new Label("Confirm"));     
     		                	horizontalPanel.add(verticalPanel);
     						}
+    						else {
+    							
+    							verticalPanel.remove(0);
+    							verticalPanel.remove(1);
+    						}
+    							
 
         				}
         			}
