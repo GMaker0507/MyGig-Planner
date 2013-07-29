@@ -463,7 +463,7 @@ public class MyGig_Planner implements EntryPoint {
 
 			@Override
 			public void onSelection(SelectionEvent<Integer> event) {
-				// TODO Auto-generated method stub
+			
 				
 				// Get its associated widget
 				Widget w = ((TabPanel)event.getSource()).getWidget(event.getSelectedItem());
