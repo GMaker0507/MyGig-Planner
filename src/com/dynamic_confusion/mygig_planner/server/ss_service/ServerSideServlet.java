@@ -248,7 +248,7 @@ public class ServerSideServlet extends HttpServlet {
 				
 				int y = (int)Math.floor(Math.random()*((double)3));
 				
-				int repN = Math.random()> 0.5 ? -1 : 1;
+				int repN = rep?(Math.random()> 0.5 ? -1 : 1):0;
 				
 				// Set the gig information
 				gigOffer.setProperty("name",user1Entity.getProperty("random-gig-1."+Math.random()));
