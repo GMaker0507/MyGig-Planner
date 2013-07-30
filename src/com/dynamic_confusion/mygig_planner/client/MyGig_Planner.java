@@ -34,6 +34,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
@@ -161,15 +162,35 @@ public class MyGig_Planner implements EntryPoint {
 		// If we have an active user
 		if(Cookies.getCookie("activeUser")!=null){
 			
-			// Add the appropriate states
-			tp.add(logout, "Log Out");	
-			tp.add(logbook,"Logbook");
+			// Add the appropriate states	
 			tp.add(viewEditProfile,"View/Edit Profile");
 			tp.add(search,"Search/Browse");
-		
+			tp.add(logbook,"Logbook");
+			tp.add(logout, "Log Out");	
 		}
 		
-		tp.add(new HTML("tab 3"),"Help");	
-		tp.add(projectFilesAndInformation,"Project Files & Information");	
+		// Adding the help tab
+		FlexTable helpPanel = new FlexTable();
+		tp.add(helpPanel,"Help");	
+		helpPanel.setWidget(0, 0, new Label("Help Section:"));
+		helpPanel.setWidget(2, 0, new Label("The MyGig Planner is simple and elegant in such ways that users can easily pick up on it."));
+		helpPanel.setWidget(3, 0, new Label("-------The home tab consist of a calendar that will provide the gig transactions between bands and venues."));
+		helpPanel.setWidget(4, 0, new Label("-------The logbook tab will keep track of activities based on dates."));
+		helpPanel.setWidget(5, 0, new Label("-------The search tab will search through bands with sorting feature."));
+		helpPanel.setWidget(6, 0, new Label("-------The profile tab will allow users to edit their profile."));
+		helpPanel.setWidget(8, 0, new Label("For further assistance, click the call button to contact our developers personally!"));
+		Button contactButton = new Button("Call Support");
+		helpPanel.setWidget(10, 0, contactButton);
+		
+		contactButton.addClickHandler(new ClickHandler(){
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				
+				Window.alert("Our developer is taking a break, please try again later.");
+			}
+		});
+		
+		//tp.add(projectFilesAndInformation,"Project Files & Information");	
 	}
 }
