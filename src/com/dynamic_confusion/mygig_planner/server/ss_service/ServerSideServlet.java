@@ -454,9 +454,7 @@ public class ServerSideServlet extends HttpServlet {
 
 	private void processRegistrationRequest(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		
-		PrintWriter out = resp.getWriter();
-		
+				
 		try{
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 			
@@ -479,7 +477,7 @@ public class ServerSideServlet extends HttpServlet {
 			
 			// Set the other user entity properties
 			newUser.setProperty("username", req.getParameter("username"));
-			newUser.setProperty("type", req.getParameter("venue"));
+			newUser.setProperty("type", "venue");
 			newUser.setProperty("email", req.getParameter("email"));
 			newUser.setProperty("genre", req.getParameter("genre"));
 			newUser.setProperty("password", req.getParameter("password"));
@@ -492,7 +490,7 @@ public class ServerSideServlet extends HttpServlet {
 			newUser.setProperty("priceRange", Double.parseDouble(req.getParameter("priceRange")));
 			newUser.setProperty("capacity", Integer.parseInt(req.getParameter("capacity")));
 			newUser.setProperty("openHours", req.getParameter("openHours"));
-			newUser.setProperty("gigCount", Integer.parseInt(req.getParameter("gigCount")));
+			newUser.setProperty("gigCount", 0);
 			newUser.setProperty("dateJoined", new Date());
 			
 			// Add the new user to the datastore
@@ -627,7 +625,7 @@ public class ServerSideServlet extends HttpServlet {
 		// Process accordingly
 		if(action.equals("admin"))processAdminRequest(req, resp);
 		else if(action.equals("login"))processLoginRequest(req, resp);
-		else if(action.equals("register"))processRegistrationRequest(req, resp);
+		else if(action.equals("registration"))processRegistrationRequest(req, resp);
 		else if(action.equals("profile"))processProfileRequest(req, resp);
 		else if(action.equals("availability"))processAvailabilityRequest(req, resp);
 		else if(action.equals("gig"))processGigTransactionRequest(req, resp);

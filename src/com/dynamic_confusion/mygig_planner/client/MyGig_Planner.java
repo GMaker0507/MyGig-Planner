@@ -167,6 +167,7 @@ public class MyGig_Planner implements EntryPoint {
 			tp.add(search,"Search/Browse");
 			tp.add(logbook,"Logbook");
 			tp.add(logout, "Log Out");	
+			tp.add(projectFilesAndInformation,"Project Files & Information");
 		}
 		
 		// Adding the help tab

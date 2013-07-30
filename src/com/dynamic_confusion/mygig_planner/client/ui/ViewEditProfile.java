@@ -330,6 +330,8 @@ public class ViewEditProfile extends Composite {
 	
 	public void update(){
 		
+		if(Cookies.getCookie("activeUser")==null)return;
+		
 		// Are we editing
 		btnSaveChanges.setText(edit ? "Save Changes" : "Edit Profile");
 		

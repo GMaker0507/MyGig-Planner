@@ -175,11 +175,13 @@ public class Logbook extends Composite {
 			
 		});
 		
-		update();
-		updateCalendar();
+		//update();
+		//updateCalendar();
 	}
 	
 	private void update(){
+		
+		if(Cookies.getCookie("activeUser")==null)return;
 
 		Date today = datePicker.getValue();
 		
@@ -233,6 +235,8 @@ public class Logbook extends Composite {
 	private void updateCalendar(){
 		
 
+		
+		if(Cookies.getCookie("activeUser")==null)return;
 
 		
 		final DatePicker dpFinal = datePicker;

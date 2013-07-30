@@ -90,9 +90,6 @@ public class Register extends Composite {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				registerButtonFinal.setText("Proccessing...");
-				registerButtonFinal.setEnabled(false);
-				
 				// If the username and password and verpassword text boxes are empty, ask user to fill it
 				if (userTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || verpassTextBox.getText().isEmpty()) {
 					
@@ -101,6 +98,9 @@ public class Register extends Composite {
 				
 				// If the password and verpassword fields don't match, alert the user
 				else if (!passTextBox.getText().matches(verpassTextBox.getText())) {
+					
+					registerButtonFinal.setText("Proccessing...");
+					registerButtonFinal.setEnabled(false);
 					
 					Window.alert("Password and Verify Password does not match, please type in right or get!!");
 				}
