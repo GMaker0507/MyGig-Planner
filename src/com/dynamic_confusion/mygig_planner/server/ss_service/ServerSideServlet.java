@@ -132,7 +132,7 @@ public class ServerSideServlet extends HttpServlet {
 			newEntity.setProperty("username",newUser.username);
 			newEntity.setProperty("type", newUser.type);
 			newEntity.setProperty("email",newUser.email);
-			newEntity.setProperty("genre", newUser.genre);
+			newEntity.setProperty("genre", newUser.genre.toLowerCase());
 			newEntity.setProperty("password", newUser.password);
 			newEntity.setProperty("hasHospitalityPack", newUser.hasHospitalityPack);
 			newEntity.setProperty("hasPA", newUser.hasPA);
@@ -479,7 +479,7 @@ public class ServerSideServlet extends HttpServlet {
 			newUser.setProperty("username", req.getParameter("username"));
 			newUser.setProperty("type", "venue");
 			newUser.setProperty("email", req.getParameter("email"));
-			newUser.setProperty("genre", req.getParameter("genre"));
+			newUser.setProperty("genre", req.getParameter("genre").toLowerCase());
 			newUser.setProperty("password", req.getParameter("password"));
 			newUser.setProperty("hasHospitalityPack", req.getParameter("hasHospitalityPack")=="true");
 			newUser.setProperty("hasPA", req.getParameter("hasPA")=="true");

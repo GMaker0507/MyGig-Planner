@@ -61,7 +61,6 @@ public class Browse extends Composite {
 		lblBackToSearch.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				form.clear();
-				form.add(new Search(ssService));
 			}
 		});
 		browseTable.setWidget(1, 0, lblBackToSearch);
@@ -291,13 +290,19 @@ public class Browse extends Composite {
 	private void getResults() {
 		form.clear();
 		
+		
 		SearchInfo searchInfo = new SearchInfo();
 		searchInfo.hasPA = requiresPA;
 		searchInfo.hasHospitalityPack = requiresHospPack;
 		searchInfo.isAvailable = availableOnly;
 		searchInfo.onlyOriginalMusic = original;
 		searchInfo.hasSoundPerson = needsSoundPerson;
-		searchInfo.genre = (String[])genre.toArray();
+		searchInfo.genre = new String[genre.size()];
+		
+		for(int i=0;i<searchInfo.genre.length;i++){
+			
+			searchInfo.genre[i] = (String)genre.toArray()[i];
+		}
 		
 		ssService.search(searchInfo, new AsyncCallback() {
 

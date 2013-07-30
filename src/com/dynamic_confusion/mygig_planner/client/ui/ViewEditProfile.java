@@ -365,7 +365,9 @@ public class ViewEditProfile extends Composite {
 		
 		final UserInfo user = showUser == null ? defaultUser : showUser;
 		
+		
 		if(user==null)return;
+		showUser = null;
 		
 		vepch.user = user;
 		vepch.aCalen = this.availabilityCalendar;

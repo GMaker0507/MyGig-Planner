@@ -181,6 +181,12 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		// Add requirements if they were set
 		if(info.genre!=null){
 			
+			System.out.println("Genres: "+info.genre);
+			for(int i=0;i<info.genre.length;i++){
+
+				System.out.println("\tGenre: "+info.genre[i]);
+			}
+			
 			// If we only have one			
 			if(info.genre.length==1)ands.add(new FilterPredicate("genre",FilterOperator.EQUAL,info.genre[0]));
 			
@@ -245,7 +251,8 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 			List<Filter> dateAnds = new ArrayList<Filter>();
 			
 			// Add matching one of the names
-			dateAnds.add(new CompositeFilter(CompositeFilterOperator.OR,dateOrs));	
+			if(dateOrs.size()>1)dateAnds.add(new CompositeFilter(CompositeFilterOperator.OR,dateOrs));	
+			else if(dateOrs.size()==1)dateAnds.add(dateOrs.get(0));
 			
 			// Add matching the date
 			dateAnds.add(new FilterPredicate("dateAvailable",FilterOperator.EQUAL,info.date));

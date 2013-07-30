@@ -6,7 +6,7 @@ import java.util.Date;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-public class GigInfo implements Serializable{
+public class GigInfo implements Serializable, Comparable<GigInfo>{
 	
 	public String key;		
 	public String name;	
@@ -21,7 +21,7 @@ public class GigInfo implements Serializable{
 	public Date dateSent;	
 	public Date dateReplied;
 	public Date[] performanceDates;
-	public int sort = 0;
+	public int sort = -1;
 	
 	public String getEntityName() {
 		// TODO Auto-generated method stub
@@ -35,6 +35,11 @@ public class GigInfo implements Serializable{
 				(status==0 ? ". No reply yet!" :
 				(status==1 ? "Accepted on "+dateReplied.toString() :
 				"Rejected on "+dateReplied.toString()));
+	}
+	
+	public Date getSortDate(){
+			
+		return dateReplied==null? dateSent : sort==0 ? dateSent : dateReplied;		
 	}
 
 	public String toLogbookString(String user) {
@@ -74,5 +79,11 @@ public class GigInfo implements Serializable{
 		
 		// TODO Auto-generated method stub
 		return gi;
+	}
+
+	@Override
+	public int compareTo(GigInfo o) {
+
+		return o.getSortDate().compareTo(getSortDate());
 	}
 }

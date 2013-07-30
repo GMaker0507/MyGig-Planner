@@ -291,3 +291,13 @@ input[type=text], textarea,input[type=password] {
   color:#000;
   font-size: small;
 }
+
+select{
+	color:#c5b1e7;
+}
+option{
+	color:#c5b1e7;
+}
+.scroller{
+	overflow:scroll;
+}

@@ -1,6 +1,7 @@
 package com.dynamic_confusion.mygig_planner.client.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -305,6 +306,8 @@ public class Logbook extends Composite {
 		
 		List<GigInfo> weekGigs = new ArrayList<GigInfo>();
 		
+		
+		
 		for(int i=0;i<gigs.length;i++){
 			
 			if(weekGigs.size()>=limit)break;
@@ -332,6 +335,8 @@ public class Logbook extends Composite {
 				}
 			}
 		}
+		
+		Collections.sort(weekGigs);
 		
 		for(int i=0;i<10;i++){
 			

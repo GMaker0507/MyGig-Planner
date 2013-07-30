@@ -66,8 +66,12 @@ public class UserInfo implements Serializable {
 		onlyOriginalMusic = Math.random() < 0.5;
 		hasHospitalityPack = Math.random() < 0.5;
 		
-		String[] firsts = new String[]{"Jason","Johnny","Frank","Eric","Marcus","David","Will","John","Bill","George","Mike","Allen","Larry","Joe","Bob","Rashard","David","Travis"};
-		String[] lasts = new String[]{"Johnson","Smith","Hobbs","Lin","Jennings","West","Vick","Williams","Ma","Morrow","Blankenship","Jones","Jackson","Thorton","Baley"};
+		String[] firsts = new String[]{
+				"Bill","Robert","Jason","Johnny","Frank","Eric","Marcus","David","Will","John","Bill",
+				"George","Mike","Allen","Larry","Joe","Bob","Rashard","David","Travis","Ashely","Kimberly","Kim","Jermy","Theodore","Teddy","Donald","Joel"};
+		String[] lasts = new String[]{
+				"Clinton","Bush","Johnson","Smith","Hobbs","Lin","Jennings","West","Vick","Williams","Ma","Jenkins","Bryant","O'neal",
+				"Morrow","Blankenship","Jones","Jackson","Thorton","Baley","Woods","White"};
 		
 		firstName = firsts[(int) ((int)(Math.random()*((double)firsts.length)))];
 		lastName = lasts[(int) ((int)(Math.random()*((double)lasts.length)))];

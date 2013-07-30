@@ -88,7 +88,7 @@ public class MyGig_Planner implements EntryPoint {
 		// Create our states
 		home = new Home(ssService,tp);
 		logbook = new Logbook(ssService);
-		search = new Search(ssService);
+		search = new Search(ssService,tp);
 		logout = new Logout(tp);
 		viewEditProfile = new ViewEditProfile(ssService);
 		projectFilesAndInformation = new ProjectFilesAndInformation();
