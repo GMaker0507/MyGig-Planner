@@ -20,6 +20,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -253,6 +256,17 @@ public class ViewEditProfile extends Composite {
 		absolutePanel.add(chckbxOnlyOriginalMusic, 30, 278);
 		chckbxOnlyOriginalMusic.setSize("218px", "19px");
 		
+		Hidden hiddenUsername = new Hidden();
+		absolutePanel.add(hiddenUsername);
+		
+		hiddenUsername.setName("username");
+		hiddenUsername.setValue(Cookies.getCookie("activeUser"));
+		txtOpenHours.setName("openHours");
+		chckbxHasPASystem.setName("hasPA");
+		chckbxHasSoundPerson.setName("hasSoundPerson");
+		chckbxOnlyOriginalMusic.setName("onlyOriginalMusic");
+		chckbxRequiresHospitalityPack.setName("hasHospitalityPack");
+		
 
 		// Add a click handler
 		btnChangeAvailability.addClickHandler((ClickHandler)(vepch = new VEPClickHandler()));
@@ -286,11 +300,24 @@ public class ViewEditProfile extends Composite {
 					
 					// Submit the form
 					editForm.submit();
+					
 				}
+
+				update();
+			}
+			
+			
+		});
+		
+		editForm.addSubmitCompleteHandler(new SubmitCompleteHandler(){
+
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				// TODO Auto-generated method stub
+				defaultUser = null;
 				
 				// Update the layout
 				update();
-				
 			}
 			
 			
@@ -302,6 +329,8 @@ public class ViewEditProfile extends Composite {
 	
 	
 	public void update(){
+		
+		if(Cookies.getCookie("activeUser")==null)return;
 		
 		// Are we editing
 		btnSaveChanges.setText(edit ? "Save Changes" : "Edit Profile");

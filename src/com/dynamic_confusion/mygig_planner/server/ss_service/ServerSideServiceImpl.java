@@ -56,59 +56,76 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 		GigInfo[] gigs = new GigInfo[0];
 		
 		try{
-			
-			// Get the datastore
-			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
 			// Match recipients or senders
 			FilterPredicate recipient = new FilterPredicate("recipientUser",FilterOperator.EQUAL,user);
+			
 			FilterPredicate send = new FilterPredicate("sendUser",FilterOperator.EQUAL,user);
-			
-			Collection<Filter> userCollection = new ArrayList<Filter>();
-			Collection<Filter> dateCollection = new ArrayList<Filter>();
-			Collection<Filter> userDateCollection = new ArrayList<Filter>();
-			
-			userCollection.add(recipient);
-			userCollection.add(send);
-			
-			long toDays = 1000*60*60*24;
-			long numDays = 1+(endRange.getTime() - startRange.getTime()) / toDays;
-			
-			System.out.println("We Have "+numDays+" Days from "+startRange+" to "+endRange);
 
-			Date d = new Date();
-			
-			for(int i=0;i<numDays;i++){
-				
-				// Set the days
-				d.setTime(startRange.getTime()+toDays*i);
-				
-				// Clear the minor parts
-				d.setHours(0);
-				d.setMinutes(0);
-				d.setSeconds(0);	
-				
-				System.out.println("Adding for day: "+d);
-				
-				// Match date sent or replied
-				dateCollection.add(new FilterPredicate("dateSent",FilterOperator.EQUAL,d));
-				dateCollection.add(new FilterPredicate("dateReplied",FilterOperator.EQUAL,d));
-			}
+			Collection<Filter> userCollection = new ArrayList<Filter>();
+			userCollection.add(recipient);
+			userCollection.add(send);			
 			
 			// We or the recipient or sender
 			CompositeFilter userFilter = new CompositeFilter(CompositeFilterOperator.OR,userCollection);
 			
-			// We or the date sent or replied
-			CompositeFilter dateFilter = new CompositeFilter(CompositeFilterOperator.OR,dateCollection);
+			Query getGigs = null;
 			
-			userDateCollection.add(userFilter);
-			userDateCollection.add(dateFilter);
+			// Get the datastore
+			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 			
-			// We and the two previous date filter and user filter
-			CompositeFilter userDateFilter = new CompositeFilter(CompositeFilterOperator.AND,userDateCollection);
 			
-			// Get gigs meeting this query
-			Query getGigs = new Query("Gig").setFilter(userDateFilter);
+			if(startRange==null||endRange==null){
+				
+				// Only use the user filter
+				getGigs = new Query("Gig").setFilter(userFilter);
+				
+			}else{
+				
+				Collection<Filter> dateCollection = new ArrayList<Filter>();
+				Collection<Filter> userDateCollection = new ArrayList<Filter>();
+				
+				long toDays = Long.parseLong(""+1000*60*60*24);
+				long numDays = 1+(endRange.getTime() - startRange.getTime()) / toDays;
+				
+				System.out.println("We Have "+numDays+" Days from "+startRange+" to "+endRange);
+	
+				for(int i=0;i<numDays;i++){
+					Date d = new Date();
+					
+					
+					// Set the days
+					d.setTime(startRange.getTime()+toDays*i);
+					
+					// Clear the minor parts
+					d.setHours(0);
+					d.setMinutes(0);
+					d.setSeconds(0);	
+					
+					d = new Date(d.getYear(),d.getMonth(),d.getDate());
+					
+					System.out.println("Adding for day: "+d);
+					
+					// Match date sent or replied
+					dateCollection.add(new FilterPredicate("dateSent",FilterOperator.EQUAL,d));
+					dateCollection.add(new FilterPredicate("dateReplied",FilterOperator.EQUAL,d));
+				}
+				
+				// We or the date sent or replied
+				CompositeFilter dateFilter = new CompositeFilter(CompositeFilterOperator.OR,dateCollection);
+				
+				userDateCollection.add(userFilter);
+				userDateCollection.add(dateFilter);
+				
+				// We and the two previous date filter and user filter
+				CompositeFilter userDateFilter = new CompositeFilter(CompositeFilterOperator.AND,userDateCollection);
+				
+				// Get gigs meeting this query
+				getGigs = new Query("Gig").setFilter(userFilter);
+			
+			}
+			
+			getGigs.addSort("sortDate", SortDirection.DESCENDING);
 			
 			PreparedQuery pqGetGigs = datastore.prepare(getGigs);
 			
@@ -134,8 +151,10 @@ public class ServerSideServiceImpl extends RemoteServiceServlet implements Serve
 				gigs[i].dateSent = (Date)gigEntities.get(i).getProperty("dateSent");
 				gigs[i].dateReplied = (Date)gigEntities.get(i).getProperty("dateReplied");
 				
-				System.out.println(gigs[i].toString());
+				System.out.println("Printging out in sssl: "+gigs[i].toString());
 			}
+			
+			System.out.println("Final - We found "+gigEntities.size()+" gigs");
 			
 		}catch(Exception e){
 			e.printStackTrace();

@@ -104,6 +104,13 @@ body, html{
     left:0px;
 }
 
+#starterImage{
+    
+    position: absolute;
+    left:0px;
+    top:36px;
+}
+
 #popularGenres{
     
     width:100%;
