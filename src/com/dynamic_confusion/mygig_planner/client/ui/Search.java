@@ -71,12 +71,6 @@ public class Search extends Composite {
 		ScrollPanel scrollPanel_1 = new ScrollPanel();
 		form.add(scrollPanel_1);
 		scrollPanel_1.setHeight("442px");
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void getResults() {
@@ -95,7 +89,7 @@ public class Search extends Composite {
 			}
 
 			public void onSuccess(Object result) {
-				UserInfo[] userInfo = (UserInfo[]) result;
+				final UserInfo[] userInfo = (UserInfo[]) result;
 
 				// Sets result of search to tables
 				
@@ -108,10 +102,25 @@ public class Search extends Composite {
 					Label username = new Label(userInfo[i].username);
 					Label email = new Label(userInfo[i].email);
 					
+					// Create Send Gig Offer button
+					Button btnsendGigOffer = new Button("Send Gig Offer");
+					final int userNum = i;
+					btnsendGigOffer.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							form.clear();
+							SendGigOffer sendGigOffer = new SendGigOffer(ssService, userInfo[userNum]);
+							form.add(sendGigOffer);
+						}
+					});
+					
+					// Add results to panel
 					for(String word : searchWords)
-						if(username.getText().contains(word))
-							resultsPanel.add(username, 10, 50*(numRows+5));
-							resultsPanel.add(email, 200, 50*(numRows+5));
+						if(username.getText().contains(word)) {
+							resultsPanel.add(username, 10, 50*numRows+20);
+							resultsPanel.add(email, 150, 50*numRows+20);
+							resultsPanel.add(btnsendGigOffer, 300, 50*numRows+20);
+							break;
+						}
 						numRows++;
 				}
 			}

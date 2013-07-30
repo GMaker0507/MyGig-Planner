@@ -27,14 +27,14 @@ public class Browse extends Composite {
 	TreeSet<String> genre;
 	
 	int minCapacity = Integer.MAX_VALUE;
-	int maxPay = Integer.MAX_VALUE;
+	int minPay = Integer.MAX_VALUE;
 	Boolean requiresPA = false;
 	Boolean requiresHospPack = false;
 	Boolean original = false;
 	Boolean needsSoundPerson = false;
 	Boolean availableOnly = false;
 	TextBox txtbxminCapacity;
-	TextBox txtbxmaxPay;
+	TextBox txtbxminPay;
 	
 	public Browse(ServerSideServiceClientImpl service) {
 		
@@ -83,7 +83,7 @@ public class Browse extends Composite {
 		browseButton.setStyleName("mgp-Button");
 		absolutePanel.add(browseButton, 10, 474);
 		
-		// Radiio buttons for Availability
+		// Radio buttons for Availability
 		{
 			Label lblAvailable = new Label("Available");
 			absolutePanel.add(lblAvailable, 0, 3);
@@ -225,9 +225,9 @@ public class Browse extends Composite {
 			// Text box and label for the minimum pay of the venue
 			Label labelminPay = new Label("Minimum Pay");
 			absolutePanel.add(labelminPay, 10, 336);
-			txtbxmaxPay = new TextBox();
-			absolutePanel.add(txtbxmaxPay, 10, 356);
-			txtbxmaxPay.setSize("90px", "8px");
+			txtbxminPay = new TextBox();
+			absolutePanel.add(txtbxminPay, 10, 356);
+			txtbxminPay.setSize("90px", "12px");
 		
 			// Check box for if the band requires a PA
 			CheckBox chckbxrequiresPA = new CheckBox("Requires PA");
@@ -286,12 +286,6 @@ public class Browse extends Composite {
 		
 		AbsolutePanel resultsPanel = new AbsolutePanel();
 		scrollPanel.setWidget(resultsPanel);
-		Label label = new Label("testuser");
-		label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		label.setStyleName("userHeader");
-		resultsPanel.add(label, 10, 50);
-		resultsPanel.add(new Label("testemail"), 200, 50);
-		
 	}
 	
 	private void getResults() {
@@ -305,11 +299,6 @@ public class Browse extends Composite {
 		searchInfo.hasSoundPerson = needsSoundPerson;
 		searchInfo.genre = (String[])genre.toArray();
 		
-		if( txtbxminCapacity.getValue().equals("") )
-			minCapacity = 0;
-		if( txtbxmaxPay.getValue().equals("") )
-			maxPay = 0;
-		
 		ssService.search(searchInfo, new AsyncCallback() {
 
 			public void onFailure(Throwable caught) {
@@ -318,7 +307,7 @@ public class Browse extends Composite {
 			}
 
 			public void onSuccess(Object result) {
-				UserInfo[] userInfo = (UserInfo[]) result;
+				final UserInfo[] userInfo = (UserInfo[]) result;
 				
 				AbsolutePanel resultsPanel = new AbsolutePanel();
 				scrollPanel.setWidget(resultsPanel);
@@ -328,8 +317,20 @@ public class Browse extends Composite {
 					Label username = new Label(userInfo[i].username);
 					Label email = new Label(userInfo[i].email);
 					
-					resultsPanel.add(username, 10, 50*(i+5));
-					resultsPanel.add(email, 200, 50*(i+5));
+					// Create Send Gig Offer button
+					Button btnsendGigOffer = new Button("Send Gig Offer");
+					final int userNum = i;
+					btnsendGigOffer.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							form.clear();
+							SendGigOffer sendGigOffer = new SendGigOffer(ssService, userInfo[userNum]);
+							form.add(sendGigOffer);
+						}
+					});
+					
+					resultsPanel.add(username, 10, 50*i+20);
+					resultsPanel.add(email, 150, 50*i+20);
+					resultsPanel.add(btnsendGigOffer, 300, 50*i+20);
 					
 				}
 			}
